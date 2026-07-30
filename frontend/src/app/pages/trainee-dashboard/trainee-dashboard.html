@@ -1,0 +1,16 @@
+<div class="dashboard">
+  <header>
+    <h1>لوحة تحكم المتدرّب</h1>
+    <div class="user-box">
+      <span>{{ auth.user()?.name }}</span>
+      <span class="role">TRAINEE</span>
+      <button (click)="logout()">خروج</button>
+    </div>
+  </header>
+
+  <ul class="modules">
+    <li>عرض الكورسات</li>
+    <li>عرض الحضور</li>
+    <li>عرض العلامات</li>
+  </ul>
+</div>

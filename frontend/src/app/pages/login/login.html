@@ -1,0 +1,35 @@
+<div class="login-page">
+  <div class="login-card">
+
+    <h1>تسجيل الدخول</h1>
+    <p class="subtitle">أكاديمية التدريب</p>
+
+    @if (errorMessage()) {
+      <div class="alert">{{ errorMessage() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="field">
+        <label for="email">البريد الإلكتروني</label>
+        <input id="email" type="email" formControlName="email" placeholder="you@example.com">
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="error">أدخل بريداً إلكترونياً صحيحاً</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">كلمة السر</label>
+        <input id="password" type="password" formControlName="password">
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <span class="error">كلمة السر مطلوبة</span>
+        }
+      </div>
+
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? 'جارٍ التحقق...' : 'دخول' }}
+      </button>
+
+    </form>
+  </div>
+</div>

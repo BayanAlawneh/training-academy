@@ -1,0 +1,15 @@
+<div class="dashboard">
+  <header>
+    <h1>لوحة تحكم المدير</h1>
+    <div class="user-box">
+      <span>{{ auth.user()?.name }}</span>
+      <span class="role">ADMIN</span>
+      <button (click)="logout()">خروج</button>
+    </div>
+  </header>
+
+  <ul class="modules">
+    <li>إدارة المستخدمين</li>
+    <li>إدارة بيانات النظام</li>
+  </ul>
+</div>

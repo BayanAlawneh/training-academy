@@ -1,0 +1,58 @@
+.dashboard {
+  padding: 32px;
+  font-family: system-ui, sans-serif;
+  direction: rtl;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #d5dcd8;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #14232b;
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role {
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid #1f6f6b;
+  color: #1f6f6b;
+  border-radius: 3px;
+}
+
+button {
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid #c3d0cb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.modules {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  max-width: 400px;
+}
+
+.modules li {
+  background: #fff;
+  border: 1px solid #d5dcd8;
+  border-radius: 4px;
+  padding: 14px 16px;
+}

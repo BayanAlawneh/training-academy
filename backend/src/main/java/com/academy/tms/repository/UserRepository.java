@@ -1,6 +1,6 @@
-package com.academy.tms.user.repository;
+package com.academy.tms.repository;
 
-import com.academy.tms.user.entity.User;
+import com.academy.tms.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

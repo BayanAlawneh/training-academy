@@ -1,4 +1,4 @@
-package com.academy.tms.common;
+package com.academy.tms.dto;
 
 public class ApiResponse<T> {
 

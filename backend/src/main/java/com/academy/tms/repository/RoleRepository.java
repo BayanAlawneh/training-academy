@@ -1,7 +1,7 @@
-package com.academy.tms.user.repository;
+package com.academy.tms.repository;
 
-import com.academy.tms.user.entity.Role;
-import com.academy.tms.user.entity.RoleName;
+import com.academy.tms.entities.Role;
+import com.academy.tms.entities.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

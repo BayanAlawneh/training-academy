@@ -1,4 +1,4 @@
-package com.academy.tms.user.entity;
+package com.academy.tms.entities;
 
 import jakarta.persistence.*;
 

@@ -1,10 +1,10 @@
 package com.academy.tms.config;
 
-import com.academy.tms.user.entity.Role;
-import com.academy.tms.user.entity.RoleName;
-import com.academy.tms.user.entity.User;
-import com.academy.tms.user.repository.RoleRepository;
-import com.academy.tms.user.repository.UserRepository;
+import com.academy.tms.entities.Role;
+import com.academy.tms.entities.RoleName;
+import com.academy.tms.entities.User;
+import com.academy.tms.repository.RoleRepository;
+import com.academy.tms.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

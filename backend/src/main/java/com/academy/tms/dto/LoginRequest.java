@@ -1,4 +1,4 @@
-package com.academy.tms.auth.dto;
+package com.academy.tms.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

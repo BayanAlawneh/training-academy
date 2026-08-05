@@ -1,9 +1,9 @@
-package com.academy.tms.auth.controller;
+package com.academy.tms.controller;
 
-import com.academy.tms.auth.dto.LoginRequest;
-import com.academy.tms.auth.dto.LoginResponse;
-import com.academy.tms.auth.service.AuthService;
-import com.academy.tms.common.ApiResponse;
+import com.academy.tms.dto.LoginRequest;
+import com.academy.tms.dto.LoginResponse;
+import com.academy.tms.services.AuthService;
+import com.academy.tms.dto.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

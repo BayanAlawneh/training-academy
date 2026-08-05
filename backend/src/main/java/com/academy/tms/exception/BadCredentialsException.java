@@ -1,4 +1,4 @@
-package com.academy.tms.auth.service;
+package com.academy.tms.exception;
 
 public class BadCredentialsException extends RuntimeException {
 

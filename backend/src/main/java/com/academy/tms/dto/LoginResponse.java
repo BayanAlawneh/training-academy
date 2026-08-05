@@ -1,4 +1,4 @@
-package com.academy.tms.auth.dto;
+package com.academy.tms.dto;
 
 public class LoginResponse {
 

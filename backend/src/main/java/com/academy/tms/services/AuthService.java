@@ -1,9 +1,10 @@
-package com.academy.tms.auth.service;
+package com.academy.tms.services;
 
-import com.academy.tms.auth.dto.LoginRequest;
-import com.academy.tms.auth.dto.LoginResponse;
-import com.academy.tms.user.entity.User;
-import com.academy.tms.user.repository.UserRepository;
+import com.academy.tms.dto.LoginRequest;
+import com.academy.tms.dto.LoginResponse;
+import com.academy.tms.entities.User;
+import com.academy.tms.exception.BadCredentialsException;
+import com.academy.tms.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

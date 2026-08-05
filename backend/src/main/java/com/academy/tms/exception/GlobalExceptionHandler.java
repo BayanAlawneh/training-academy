@@ -1,6 +1,6 @@
-package com.academy.tms.common;
+package com.academy.tms.exception;
 
-import com.academy.tms.auth.service.BadCredentialsException;
+import com.academy.tms.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

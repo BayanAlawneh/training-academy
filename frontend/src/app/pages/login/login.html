@@ -26,7 +26,7 @@
         }
       </div>
 
-      <button type="submit" [disabled]="loading()">
+     <button type="submit" [disabled]="loading() || form.invalid">
         {{ loading() ? 'جارٍ التحقق...' : 'دخول' }}
       </button>
 

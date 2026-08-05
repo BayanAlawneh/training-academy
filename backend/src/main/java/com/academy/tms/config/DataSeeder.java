@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -30,12 +32,16 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        seedUser("System Admin", "admin@gmail.com", RoleName.ADMIN);
-        seedUser("Ahmed Zaid", "ahmed@gmail.com", RoleName.TRAINER);
-        seedUser("Sara Khalil", "sara@gmail.com", RoleName.TRAINEE);
+        seedUser("admin", "System Admin", "admin@gmail.com",
+                LocalDate.of(1990, 1, 15), RoleName.ADMIN);
+        seedUser("ahmed", "Ahmed Zaid", "ahmed@gmail.com",
+                LocalDate.of(1988, 6, 22), RoleName.TRAINER);
+        seedUser("sara", "Sara Khalil", "sara@gmail.com",
+                LocalDate.of(2001, 3, 10), RoleName.TRAINEE);
     }
 
-    private void seedUser(String name, String email, RoleName roleName) {
+    private void seedUser(String username, String name, String email,
+                          LocalDate dateOfBirth, RoleName roleName) {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             return;
         }
@@ -43,6 +49,7 @@ public class DataSeeder implements CommandLineRunner {
         Role role = roleRepository.findByRoleName(roleName)
                 .orElseThrow(() -> new IllegalStateException("Role not found: " + roleName));
 
-        userRepository.save(new User(name, email, passwordEncoder.encode(DEMO_PASSWORD), role));
+        userRepository.save(new User(username, name, email,
+                passwordEncoder.encode(DEMO_PASSWORD), dateOfBirth, role));
     }
 }

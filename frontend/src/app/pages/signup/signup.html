@@ -1,0 +1,65 @@
+<div class="signup-page">
+  <div class="signup-card">
+
+    <h1>إنشاء حساب</h1>
+    <p class="subtitle">حساب مدير جديد</p>
+
+    @if (errorMessage()) {
+      <div class="alert">{{ errorMessage() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="field">
+        <label for="username">اسم المستخدم</label>
+        <input id="username" type="text" formControlName="username">
+        @if (form.controls.username.invalid && form.controls.username.touched) {
+          <span class="error">اسم المستخدم مطلوب (٣ أحرف على الأقل)</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="name">الاسم الكامل</label>
+        <input id="name" type="text" formControlName="name">
+        @if (form.controls.name.invalid && form.controls.name.touched) {
+          <span class="error">الاسم مطلوب</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">البريد الإلكتروني</label>
+        <input id="email" type="email" formControlName="email">
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="error">أدخل بريداً إلكترونياً صحيحاً</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">كلمة السر</label>
+        <input id="password" type="password" formControlName="password">
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <span class="error">كلمة السر مطلوبة (٦ أحرف على الأقل)</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="dateOfBirth">تاريخ الميلاد</label>
+        <input id="dateOfBirth" type="date" formControlName="dateOfBirth">
+        @if (form.controls.dateOfBirth.invalid && form.controls.dateOfBirth.touched) {
+          <span class="error">تاريخ الميلاد مطلوب</span>
+        }
+      </div>
+
+      <button type="submit" [disabled]="loading() || form.invalid">
+        {{ loading() ? 'جارٍ الإنشاء...' : 'إنشاء حساب' }}
+      </button>
+
+    </form>
+
+    <p class="switch">
+      لديك حساب بالفعل؟
+      <a routerLink="/login">تسجيل الدخول</a>
+    </p>
+
+  </div>
+</div>

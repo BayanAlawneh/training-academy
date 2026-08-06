@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, AuthUser, LoginRequest, LoginResult, ROLE_HOME, RoleName } from '../models/auth.models';
+import { ApiResponse, AuthUser, LoginRequest, LoginResult, ROLE_HOME, RoleName, SignupRequest } from '../models/auth.models';
 
 const USER_KEY = 'academy.user';
 const TOKEN_KEY = 'academy.token';
@@ -21,6 +21,11 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResult>> {
     return this.http
       .post<ApiResponse<LoginResult>>(`${environment.apiUrl}/auth/login`, credentials)
+      .pipe(tap(response => this.storeSession(response.data)));
+  }
+signup(request: SignupRequest): Observable<ApiResponse<LoginResult>> {
+    return this.http
+      .post<ApiResponse<LoginResult>>(`${environment.apiUrl}/auth/signup`, request)
       .pipe(tap(response => this.storeSession(response.data)));
   }
 

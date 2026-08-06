@@ -30,3 +30,10 @@ export const ROLE_HOME: Record<RoleName, string> = {
   TRAINER: '/trainer',
   TRAINEE: '/trainee'
 };
+export interface SignupRequest {
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+  dateOfBirth: string;
+}

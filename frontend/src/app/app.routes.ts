@@ -5,6 +5,7 @@ import { Signup } from './pages/signup/signup';
 import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 import { TrainerDashboard } from './pages/trainer-dashboard/trainer-dashboard';
 import { TraineeDashboard } from './pages/trainee-dashboard/trainee-dashboard';
+import { Trainers } from './pages/trainers/trainers';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -13,6 +14,12 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminDashboard,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+{
+    path: 'admin/trainers',
+    component: Trainers,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },

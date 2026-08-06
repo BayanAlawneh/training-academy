@@ -2,9 +2,16 @@ export type RoleName = 'ADMIN' | 'TRAINER' | 'TRAINEE';
 
 export interface AuthUser {
   id: number;
+  username: string;
   name: string;
   email: string;
   role: RoleName;
+}
+
+export interface LoginResult extends AuthUser {
+  token: string;
+  tokenType: string;
+  expiresInMs: number;
 }
 
 export interface LoginRequest {

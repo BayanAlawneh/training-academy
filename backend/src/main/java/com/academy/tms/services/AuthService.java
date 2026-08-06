@@ -5,6 +5,7 @@ import com.academy.tms.dto.LoginResponse;
 import com.academy.tms.entities.User;
 import com.academy.tms.exception.BadCredentialsException;
 import com.academy.tms.repository.UserRepository;
+import com.academy.tms.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,14 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Transactional(readOnly = true)
@@ -30,8 +35,13 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user);
+
         return new LoginResponse(
+                token,
+                jwtService.getExpirationMs(),
                 user.getId(),
+                user.getUsername(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole().getRoleName().name()

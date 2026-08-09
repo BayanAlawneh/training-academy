@@ -6,6 +6,9 @@ import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 import { TrainerDashboard } from './pages/trainer-dashboard/trainer-dashboard';
 import { TraineeDashboard } from './pages/trainee-dashboard/trainee-dashboard';
 import { Trainers } from './pages/trainers/trainers';
+import { Trainees } from './pages/trainees/trainees';
+import { Courses } from './pages/courses/courses';
+import { Enrollments } from './pages/enrollments/enrollments';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -17,12 +20,31 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
-{
+  {
     path: 'admin/trainers',
     component: Trainers,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
+  {
+    path: 'admin/trainees',
+    component: Trainees,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'admin/courses',
+    component: Courses,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'admin/enrollments',
+    component: Enrollments,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+
   {
     path: 'trainer',
     component: TrainerDashboard,

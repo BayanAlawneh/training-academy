@@ -1,0 +1,165 @@
+.page {
+  padding: 32px;
+  font-family: system-ui, sans-serif;
+  direction: rtl;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #d5dcd8;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #14232b;
+}
+
+h2 {
+  margin: 0 0 18px;
+  font-size: 17px;
+  color: #14232b;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d5dcd8;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 13px;
+  color: #5e7280;
+  margin-bottom: 6px;
+}
+
+.hint {
+  font-size: 11px;
+  color: #93a3ab;
+}
+
+input {
+  padding: 9px 12px;
+  border: 1px solid #c3d0cb;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: #14232b;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #14232b;
+  color: #fff;
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: #c3d0cb;
+  color: #14232b;
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: #b23a2e;
+  color: #b23a2e;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  text-align: right;
+  font-size: 12px;
+  color: #5e7280;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d5dcd8;
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #e8ecea;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.alert {
+  background: #f6e3e0;
+  border: 1px solid #b23a2e;
+  color: #b23a2e;
+  padding: 10px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.error {
+  color: #b23a2e;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.state {
+  padding: 20px;
+  text-align: center;
+  color: #5e7280;
+}

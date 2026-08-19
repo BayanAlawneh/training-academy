@@ -1,1 +1,478 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   نظام "السجل" — التصميم الموحّد لكامل التطبيق
+   الفكرة: أكاديمية تدريب = سجلات ودفاتر. حبر داكن، ورق دافي، لمسة نحاسية،
+   وشارات أدوار على شكل ختم. هذا الملف يغطي كل الصفحات لأنه غير مقيّد
+   بـ view encapsulation في Angular (global stylesheet).
+   ========================================================================== */
+
+:root {
+  /* الأسطح */
+  --ink: #10222D;
+  --ink-2: #1B3648;
+  --paper: #EEF1EB;
+  --card: #FFFFFF;
+
+  /* الخطوط والحدود */
+  --rule: #C9D3CD;
+  --rule-soft: #E3E9E4;
+
+  /* النص */
+  --text: #17262C;
+  --muted: #5C6F73;
+  --on-ink: #E7EDE8;
+  --on-ink-muted: #97ACB2;
+
+  /* اللون النحاسي — الإجراء الأساسي */
+  --brass: #A9793B;
+  --brass-dark: #8C6530;
+  --brass-soft: #F4E8D3;
+
+  /* أخضر — المدرّب / النجاح */
+  --forest: #1F6F58;
+  --forest-soft: #DFEEE8;
+
+  /* ذهبي — المتدرّب */
+  --gold: #B4841D;
+  --gold-soft: #F7ECD3;
+
+  /* أحمر — الخطأ / الحذف */
+  --rust: #A63B2E;
+  --rust-soft: #F5E1DD;
+
+  /* الخطوط */
+  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans Arabic', sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius: 5px;
+  --shadow-card: 0 1px 2px rgba(16,34,45,.05), 0 8px 22px rgba(16,34,45,.06);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; min-height: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ==========================================================================
+   اللوجين والتسجيل
+   ========================================================================== */
+
+.login-page, .signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(1200px 500px at 15% -10%, rgba(169,121,59,.10), transparent 60%),
+    var(--paper);
+  direction: rtl;
+  padding: 32px 0;
+}
+
+.login-card, .signup-card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  padding: 36px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* لمسة الختم — طية زاوية دقيقة أعلى البطاقة، اللمسة المميّزة للتصميم */
+.login-card::before, .signup-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--brass-soft) 50%, transparent 51%);
+}
+
+.login-card h1, .signup-card h1 {
+  font-size: 25px;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  margin: 0 0 26px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-family: var(--font-mono);
+  letter-spacing: .04em;
+}
+
+/* ==========================================================================
+   الحقول والنماذج (مشترك بين كل الصفحات)
+   ========================================================================== */
+
+.field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
+  letter-spacing: .03em;
+}
+
+.hint {
+  font-size: 11px;
+  color: #93A3AB;
+  font-weight: 400;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-size: 14.5px;
+  font-family: var(--font-body);
+  background: var(--card);
+  color: var(--text);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px rgba(169,121,59,.14);
+}
+
+select:disabled { background: var(--paper); color: #93A3AB; }
+
+.error {
+  color: var(--rust);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ==========================================================================
+   الأزرار
+   ========================================================================== */
+
+button {
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background .15s ease, border-color .15s ease, opacity .15s ease;
+}
+
+button:disabled { opacity: .45; cursor: not-allowed; }
+
+.login-card button[type="submit"],
+.signup-card button[type="submit"],
+.btn-primary {
+  width: 100%;
+  background: var(--brass);
+  color: #fff;
+  border-color: var(--brass);
+}
+
+.login-card button[type="submit"]:hover:not(:disabled),
+.signup-card button[type="submit"]:hover:not(:disabled),
+.btn-primary:hover:not(:disabled) {
+  background: var(--brass-dark);
+  border-color: var(--brass-dark);
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: var(--rule);
+  color: var(--ink);
+}
+.btn-quiet:hover:not(:disabled) { border-color: var(--ink); background: var(--paper); }
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--rust);
+  color: var(--rust);
+}
+.btn-danger:hover:not(:disabled) { background: var(--rust-soft); }
+
+/* ==========================================================================
+   التنبيهات
+   ========================================================================== */
+
+.alert {
+  background: var(--rust-soft);
+  border: 1px solid var(--rust);
+  border-right: 3px solid var(--rust);
+  color: #7A2E24;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  font-size: 13.5px;
+}
+
+.notice {
+  background: var(--forest-soft);
+  border: 1px solid var(--forest);
+  border-right: 3px solid var(--forest);
+  color: #17493A;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  font-size: 13.5px;
+}
+
+.switch {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.switch a { color: var(--brass-dark); font-weight: 600; text-decoration: none; }
+.switch a:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   لوحات التحكّم (Admin / Trainer / Trainee dashboards)
+   ========================================================================== */
+
+.dashboard {
+  padding: 34px 40px;
+  direction: rtl;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.dashboard header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.dashboard h1 { font-size: 24px; }
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* الختم — شارة الدور الدائرية، لمسة التصميم المميّزة */
+.role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 15px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  border: 1.5px solid currentColor;
+  position: relative;
+  color: var(--brass-dark);
+  background: var(--brass-soft);
+}
+.role::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px dashed currentColor;
+  border-radius: 12px;
+  opacity: .35;
+}
+
+.dashboard .modules {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.dashboard .modules li {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard .modules li a {
+  display: block;
+  padding: 18px 20px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14.5px;
+  transition: border-color .15s ease, transform .15s ease;
+}
+
+.dashboard .modules li:hover {
+  border-color: var(--brass);
+}
+.dashboard .modules li:hover a {
+  transform: translateX(-2px);
+}
+
+/* ==========================================================================
+   صفحات إدارة (Trainers / Trainees / Courses / Enrollments)
+   ========================================================================== */
+
+.page {
+  padding: 32px 40px;
+  direction: rtl;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.page header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 18px;
+  margin-bottom: 26px;
+}
+
+.page h1 { font-size: 22px; }
+.page h2 { font-size: 16.5px; margin-bottom: 18px; }
+
+.actions { display: flex; gap: 8px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  box-shadow: var(--shadow-card);
+  padding: 22px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 34px; height: 34px;
+  background: linear-gradient(225deg, var(--brass-soft) 50%, transparent 51%);
+  opacity: .8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.form-actions { display: flex; gap: 8px; margin-top: 18px; }
+
+/* الجداول */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+th {
+  text-align: right;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+td {
+  padding: 13px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(169,121,59,.035); }
+
+.row-full td { background: var(--rust-soft); }
+.row-full:hover td { background: var(--rust-soft); }
+
+.row-actions { display: flex; gap: 6px; }
+
+/* شارات الحالة — نقطة + نص، لا مربع مسطّح */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  padding: 3px 10px 3px 8px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+}
+.badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge-open { color: var(--forest); background: var(--forest-soft); border-color: var(--forest); }
+.badge-full { color: var(--rust); background: var(--rust-soft); border-color: var(--rust); }
+
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 13px;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 13.5px;
+}
+
+.state {
+  padding: 22px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+}

@@ -1,2 +1,2 @@
-# training-academy
+# Training-Academy
 Training academy management system

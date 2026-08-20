@@ -3,6 +3,7 @@ package com.academy.tms.controller;
 import com.academy.tms.dto.ApiResponse;
 import com.academy.tms.dto.CourseRequest;
 import com.academy.tms.dto.CourseResponse;
+import com.academy.tms.dto.ReassignTrainerRequest;
 import com.academy.tms.services.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,13 @@ public class CourseController {
     public ResponseEntity<ApiResponse<CourseResponse>> update(@PathVariable Long id,
                                                               @Valid @RequestBody CourseRequest request) {
         return ResponseEntity.ok(ApiResponse.ok("Course updated", courseService.update(id, request)));
+    }
+
+    @PatchMapping("/{id}/trainer")
+    public ResponseEntity<ApiResponse<CourseResponse>> reassignTrainer(
+            @PathVariable Long id, @Valid @RequestBody ReassignTrainerRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "Trainer reassigned", courseService.reassignTrainer(id, request.getTrainerId())));
     }
 
     @DeleteMapping("/{id}")

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.models';
-import { Trainer, TrainerRequest } from '../models/trainer.models';
+import { Trainer, TrainerRequest, TrainerDeletionCheck } from '../models/trainer.models';
 
 @Injectable({ providedIn: 'root' })
 export class TrainerService {
@@ -13,6 +13,10 @@ export class TrainerService {
 
   findAll(): Observable<ApiResponse<Trainer[]>> {
     return this.http.get<ApiResponse<Trainer[]>>(this.baseUrl);
+  }
+
+  deletionCheck(id: number): Observable<ApiResponse<TrainerDeletionCheck>> {
+    return this.http.get<ApiResponse<TrainerDeletionCheck>>(`${this.baseUrl}/${id}/deletion-check`);
   }
 
   create(request: TrainerRequest): Observable<ApiResponse<Trainer>> {

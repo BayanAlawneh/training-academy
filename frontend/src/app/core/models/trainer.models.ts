@@ -16,3 +16,18 @@ export interface TrainerRequest {
   dateOfBirth: string;
   specialization: string;
 }
+
+export interface CourseBrief {
+  id: number;
+  title: string;
+}
+
+export interface TrainerBrief {
+  id: number;
+  name: string;
+}
+
+export interface TrainerDeletionCheck {
+  courses: CourseBrief[];
+  alternativeTrainers: TrainerBrief[];
+}

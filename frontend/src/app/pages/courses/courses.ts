@@ -1,24 +1,25 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { CourseService } from '../../core/services/course.service';
-import { TrainerService } from '../../core/services/trainer.service';
-import { Course } from '../../core/models/course.models';
-import { Trainer } from '../../core/models/trainer.models';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AuthService } from "../../core/services/auth.service";
+import { CourseService } from "../../core/services/course.service";
+import { TrainerService } from "../../core/services/trainer.service";
+import { ModalService } from "../../core/services/modal.service";
+import { Course } from "../../core/models/course.models";
+import { Trainer } from "../../core/models/trainer.models";
 
 @Component({
-  selector: 'app-courses',
+  selector: "app-courses",
   imports: [ReactiveFormsModule],
-  templateUrl: './courses.html',
-  styleUrl: './courses.css'
+  templateUrl: "./courses.html",
+  styleUrl: "./courses.css",
 })
 export class Courses implements OnInit {
-
   private readonly fb = inject(FormBuilder);
   private readonly courseService = inject(CourseService);
   private readonly trainerService = inject(TrainerService);
-  private readonly auth = inject(AuthService);
+  private readonly modal = inject(ModalService);
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly courses = signal<Course[]>([]);
@@ -30,9 +31,9 @@ export class Courses implements OnInit {
   readonly formOpen = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    title: ['', [Validators.required]],
+    title: ["", [Validators.required]],
     capacity: [1, [Validators.required, Validators.min(1)]],
-    trainerId: [0, [Validators.required, Validators.min(1)]]
+    trainerId: [0, [Validators.required, Validators.min(1)]],
   });
 
   ngOnInit(): void {
@@ -48,23 +49,23 @@ export class Courses implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage.set(err?.error?.message ?? 'تعذّر تحميل الكورسات');
+        this.errorMessage.set(err?.error?.message ?? "تعذّر تحميل الكورسات");
         this.loading.set(false);
-      }
+      },
     });
   }
 
   loadTrainers(): void {
     this.trainerService.findAll().subscribe({
       next: (response) => this.trainers.set(response.data),
-      error: () => this.errorMessage.set('تعذّر تحميل قائمة المدربين')
+      error: () => this.errorMessage.set("تعذّر تحميل قائمة المدربين"),
     });
   }
 
   openCreate(): void {
     this.editingId.set(null);
     this.errorMessage.set(null);
-    this.form.setValue({ title: '', capacity: 1, trainerId: 0 });
+    this.form.setValue({ title: "", capacity: 1, trainerId: 0 });
     this.formOpen.set(true);
   }
 
@@ -74,7 +75,7 @@ export class Courses implements OnInit {
     this.form.setValue({
       title: course.title,
       capacity: course.capacity,
-      trainerId: course.trainerId
+      trainerId: course.trainerId,
     });
     this.formOpen.set(true);
   }
@@ -99,12 +100,13 @@ export class Courses implements OnInit {
     const payload = {
       title: value.title,
       capacity: Number(value.capacity),
-      trainerId: Number(value.trainerId)
+      trainerId: Number(value.trainerId),
     };
 
-    const request = id === null
-      ? this.courseService.create(payload)
-      : this.courseService.update(id, payload);
+    const request =
+      id === null
+        ? this.courseService.create(payload)
+        : this.courseService.update(id, payload);
 
     request.subscribe({
       next: () => {
@@ -114,32 +116,38 @@ export class Courses implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.errorMessage.set(err?.error?.message ?? 'تعذّر حفظ البيانات');
-      }
+        this.errorMessage.set(err?.error?.message ?? "تعذّر حفظ البيانات");
+      },
     });
   }
 
-  remove(course: Course): void {
-    if (!confirm(`حذف الكورس ${course.title}؟`)) {
-      return;
-    }
+  async remove(course: Course): Promise<void> {
+    const ok = await this.modal.confirm(
+      "حذف الكورس",
+      `حذف الكورس ${course.title}؟`,
+      { danger: true, confirmText: "حذف" },
+    );
+    if (!ok) return;
 
     this.courseService.delete(course.id).subscribe({
       next: () => this.load(),
-      error: (err) => this.errorMessage.set(err?.error?.message ?? 'تعذّر الحذف')
+      error: (err) =>
+        this.errorMessage.set(err?.error?.message ?? "تعذّر الحذف"),
     });
   }
 
   manageEnrollment(course: Course): void {
-    this.router.navigate(['/admin/enrollments'], { queryParams: { courseId: course.id } });
+    this.router.navigate(["/admin/enrollments"], {
+      queryParams: { courseId: course.id },
+    });
   }
 
   back(): void {
-    this.router.navigateByUrl('/admin');
+    this.router.navigateByUrl("/admin");
   }
 
   logout(): void {
     this.auth.logout();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl("/login");
   }
 }

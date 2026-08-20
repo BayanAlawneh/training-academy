@@ -1,41 +1,47 @@
 /* ==========================================================================
-   نظام "السجل" — التصميم الموحّد لكامل التطبيق
-   الفكرة: أكاديمية تدريب = سجلات ودفاتر. حبر داكن، ورق دافي، لمسة نحاسية،
-   وشارات أدوار على شكل ختم. هذا الملف يغطي كل الصفحات لأنه غير مقيّد
-   بـ view encapsulation في Angular (global stylesheet).
+   نظام "دفتر السجل" — التصميم الموحّد لكامل التطبيق
+   الفكرة: أكاديمية تدريب = دفتر طالب حقيقي. ورق مربعات، شريط جانبي داكن
+   بحلقات تغليف حلزونية، أحمر دافئ للإجراءات، أختم مستقيمة للحالات.
+   هذا الملف يغطّي كل الصفحات لأنه غير مقيّد بـ view encapsulation.
    ========================================================================== */
 
 :root {
   /* الأسطح */
-  --ink: #10222D;
-  --ink-2: #1B3648;
-  --paper: #EEF1EB;
+  --ink: #0B1A22;
+  --ink-2: #14262F;
+  --paper: #FBFAF5;
   --card: #FFFFFF;
+  --card-soft: rgba(255,255,255,.78);
+
+  /* شبكة الدفتر */
+  --grid-line: #DCE3DC;
+  --grid-size: 22px;
 
   /* الخطوط والحدود */
-  --rule: #C9D3CD;
-  --rule-soft: #E3E9E4;
+  --rule: #0B1A22;
+  --rule-soft: #DCE3DC;
 
   /* النص */
-  --text: #17262C;
-  --muted: #5C6F73;
+  --text: #0B1A22;
+  --muted: #8A7A6B;
+  --muted-2: #A8967F;
   --on-ink: #E7EDE8;
-  --on-ink-muted: #97ACB2;
+  --on-ink-muted: #8FA2A8;
 
-  /* اللون النحاسي — الإجراء الأساسي */
-  --brass: #A9793B;
-  --brass-dark: #8C6530;
-  --brass-soft: #F4E8D3;
+  /* الأحمر الدافئ — الإجراء الأساسي وشارة "مكتمل" */
+  --brass: #C25A47;
+  --brass-dark: #A8452F;
+  --brass-soft: #F5DCD5;
 
-  /* أخضر — المدرّب / النجاح */
-  --forest: #1F6F58;
+  /* أخضر — المدرّب / النجاح / شارة "متاح" */
+  --forest: #17493A;
   --forest-soft: #DFEEE8;
 
   /* ذهبي — المتدرّب */
-  --gold: #B4841D;
-  --gold-soft: #F7ECD3;
+  --gold: #A8752A;
+  --gold-soft: #F3E4C9;
 
-  /* أحمر — الخطأ / الحذف */
+  /* أحمر الخطأ (أغمق من البراس عشان يتفرّق عن لون الإجراء) */
   --rust: #A63B2E;
   --rust-soft: #F5E1DD;
 
@@ -44,8 +50,8 @@
   --font-body: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --radius: 5px;
-  --shadow-card: 0 1px 2px rgba(16,34,45,.05), 0 8px 22px rgba(16,34,45,.06);
+  --radius: 6px;
+  --shadow-card: 0 1px 2px rgba(11,26,34,.05), 0 8px 20px rgba(11,26,34,.06);
 }
 
 * { box-sizing: border-box; }
@@ -53,7 +59,11 @@
 html, body { margin: 0; padding: 0; min-height: 100%; }
 
 body {
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 15px;
@@ -63,8 +73,8 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.015em;
   margin: 0;
   color: var(--ink);
 }
@@ -90,9 +100,6 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(1200px 500px at 15% -10%, rgba(169,121,59,.10), transparent 60%),
-    var(--paper);
   direction: rtl;
   padding: 32px 0;
 }
@@ -100,33 +107,22 @@ h1, h2, h3 {
 .login-card, .signup-card {
   background: var(--card);
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   padding: 36px;
   width: 100%;
   max-width: 400px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* لمسة الختم — طية زاوية دقيقة أعلى البطاقة، اللمسة المميّزة للتصميم */
-.login-card::before, .signup-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 46px; height: 46px;
-  background: linear-gradient(135deg, var(--brass-soft) 50%, transparent 51%);
 }
 
 .login-card h1, .signup-card h1 {
-  font-size: 25px;
+  font-size: 27px;
   margin: 0 0 4px;
 }
 
 .subtitle {
   margin: 0 0 26px;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
   font-family: var(--font-mono);
   letter-spacing: .04em;
 }
@@ -143,7 +139,7 @@ h1, h2, h3 {
 
 label {
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   margin-bottom: 7px;
   font-family: var(--font-mono);
@@ -152,7 +148,7 @@ label {
 
 .hint {
   font-size: 11px;
-  color: #93A3AB;
+  color: #B0A594;
   font-weight: 400;
 }
 
@@ -165,16 +161,15 @@ input, select {
   font-family: var(--font-body);
   background: var(--card);
   color: var(--text);
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition: box-shadow .15s ease;
 }
 
 input:focus, select:focus {
   outline: none;
-  border-color: var(--brass);
-  box-shadow: 0 0 0 3px rgba(169,121,59,.14);
+  box-shadow: 0 0 0 3px rgba(194,90,71,.16);
 }
 
-select:disabled { background: var(--paper); color: #93A3AB; }
+select:disabled { background: var(--paper); color: #B0A594; }
 
 .error {
   color: var(--rust);
@@ -187,10 +182,10 @@ select:disabled { background: var(--paper); color: #93A3AB; }
    ========================================================================== */
 
 button {
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 800;
   font-family: var(--font-body);
   cursor: pointer;
   border: 1px solid transparent;
@@ -220,7 +215,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   border-color: var(--rule);
   color: var(--ink);
 }
-.btn-quiet:hover:not(:disabled) { border-color: var(--ink); background: var(--paper); }
+.btn-quiet:hover:not(:disabled) { background: var(--paper); }
 
 .btn-danger {
   background: transparent;
@@ -236,23 +231,23 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .alert {
   background: var(--rust-soft);
   border: 1px solid var(--rust);
-  border-right: 3px solid var(--rust);
   color: #7A2E24;
   padding: 11px 14px;
   border-radius: var(--radius);
   margin-bottom: 18px;
   font-size: 13.5px;
+  font-weight: 600;
 }
 
 .notice {
   background: var(--forest-soft);
   border: 1px solid var(--forest);
-  border-right: 3px solid var(--forest);
   color: #17493A;
   padding: 11px 14px;
   border-radius: var(--radius);
   margin-bottom: 18px;
   font-size: 13.5px;
+  font-weight: 600;
 }
 
 .switch {
@@ -261,141 +256,154 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   font-size: 13.5px;
   color: var(--muted);
 }
-.switch a { color: var(--brass-dark); font-weight: 600; text-decoration: none; }
+.switch a { color: var(--brass-dark); font-weight: 700; text-decoration: none; }
 .switch a:hover { text-decoration: underline; }
 
 /* ==========================================================================
-   لوحات التحكّم (Admin / Trainer / Trainee dashboards)
+   القالب العام: شريط جانبي داكن + محتوى (لوحات التحكّم وصفحات الإدارة)
    ========================================================================== */
 
-.dashboard {
-  padding: 34px 40px;
+.dashboard, .page {
+  min-height: 100vh;
+  display: flex;
+  
   direction: rtl;
-  max-width: 1100px;
-  margin: 0 auto;
 }
 
-.dashboard header {
+/* الشريط الجانبي الداكن — غلاف الدفتر */
+.dashboard > header, .page > header {
+  flex: none;
+  width: 224px;
+  background: var(--ink);
+  padding: 22px 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 20px;
-  margin-bottom: 30px;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
-.dashboard h1 { font-size: 24px; }
+/* حلقات التغليف الحلزونية على حافة الشريط */
+.dashboard > header::before, .page > header::before {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 20px;
+  bottom: 20px;
+  width: 14px;
+  background-image: radial-gradient(circle, var(--paper) 5px, transparent 5.5px);
+  background-size: 14px 32px;
+  background-repeat: repeat-y;
+ pointer-events: none;
+}
 
-.user-box {
+.dashboard h1, .page h1 {
+  color: var(--ink);
+  font-size: 32px;
+}
+
+.user-box, .actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* الختم — شارة الدور الدائرية، لمسة التصميم المميّزة */
+/* الختم — شارة الدور الدائرية */
 .role {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 30px;
-  height: 30px;
+  min-width: 26px;
+  height: 26px;
   padding: 0 10px;
-  border-radius: 15px;
+  border-radius: 50%;
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  border: 1.5px solid currentColor;
-  position: relative;
-  color: var(--brass-dark);
-  background: var(--brass-soft);
-}
-.role::before {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  border: 1px dashed currentColor;
-  border-radius: 12px;
-  opacity: .35;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  background: var(--brass);
+  color: #fff;
 }
 
-.dashboard .modules {
+.dashboard .modules,
+.page .modules {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.dashboard .modules li {
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-}
-
-.dashboard .modules li a {
+.dashboard .modules li a,
+.page .modules li a {
   display: block;
-  padding: 18px 20px;
-  color: var(--ink);
+  padding: 11px 13px;
+  color: var(--on-ink-muted);
   text-decoration: none;
-  font-weight: 500;
-  font-size: 14.5px;
-  transition: border-color .15s ease, transform .15s ease;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 5px;
+  transition: background .15s ease, color .15s ease;
 }
 
-.dashboard .modules li:hover {
-  border-color: var(--brass);
+.dashboard .modules li a:hover,
+.page .modules li a:hover {
+  background: rgba(194,90,71,.18);
+  color: var(--on-ink);
 }
-.dashboard .modules li:hover a {
-  transform: translateX(-2px);
+
+/* عنصر القائمة النشط */
+.dashboard .modules li.active a,
+.dashboard .modules li a.active,
+.page .modules li.active a,
+.page .modules li a.active {
+  background: var(--brass);
+  color: #fff;
+}
+
+/* بطاقة العلامة أعلى الشريط الجانبي */
+.brand-mark {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  background: var(--brass);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 12px;
+  flex: none;
 }
 
 /* ==========================================================================
-   صفحات إدارة (Trainers / Trainees / Courses / Enrollments)
+   منطقة المحتوى
    ========================================================================== */
 
-.page {
-  padding: 32px 40px;
-  direction: rtl;
-  max-width: 1120px;
-  margin: 0 auto;
+.dashboard > *:not(header),
+.page > *:not(header) {
+  flex: 1;
+  min-width: 0;
 }
 
-.page header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 18px;
-  margin-bottom: 26px;
+.content-area {
+  padding: 30px 34px;
 }
 
-.page h1 { font-size: 22px; }
-.page h2 { font-size: 16.5px; margin-bottom: 18px; }
-
-.actions { display: flex; gap: 8px; }
+.page h1, .dashboard h1 {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
 
 .card {
-  background: var(--card);
+  background: var(--card-soft);
   border: 1px solid var(--rule);
-  border-radius: 7px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   padding: 22px;
   margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 34px; height: 34px;
-  background: linear-gradient(225deg, var(--brass-soft) 50%, transparent 51%);
-  opacity: .8;
-}
+.page h2 { font-size: 17px; margin-bottom: 18px; }
 
 .grid {
   display: grid;
@@ -418,10 +426,10 @@ th {
   font-family: var(--font-mono);
   letter-spacing: .05em;
   text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 500;
+  color: var(--ink);
+  font-weight: 800;
   padding: 11px 13px;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 2px solid var(--rule);
   white-space: nowrap;
 }
 
@@ -431,42 +439,36 @@ td {
 }
 
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: rgba(169,121,59,.035); }
+tbody tr:hover td { background: rgba(194,90,71,.04); }
 
 .row-full td { background: var(--rust-soft); }
 .row-full:hover td { background: var(--rust-soft); }
 
 .row-actions { display: flex; gap: 6px; }
 
-/* شارات الحالة — نقطة + نص، لا مربع مسطّح */
+/* شارات الحالة — ختم مستقيم بحدّ سميك */
 .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
   font-family: var(--font-mono);
-  padding: 3px 10px 3px 8px;
-  border-radius: 20px;
-  border: 1px solid transparent;
-}
-.badge::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
+  letter-spacing: .03em;
+  padding: 3px 11px;
+  border-radius: 4px;
+  border: 2px solid transparent;
 }
 
-.badge-open { color: var(--forest); background: var(--forest-soft); border-color: var(--forest); }
-.badge-full { color: var(--rust); background: var(--rust-soft); border-color: var(--rust); }
+.badge-open { color: var(--forest); border-color: var(--forest); background: transparent; }
+.badge-full { color: var(--brass-dark); border-color: var(--brass); background: transparent; }
 
 .status-box {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 13px;
-  border: 1px solid var(--rule-soft);
+  border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--card-soft);
   font-size: 13.5px;
 }
 
@@ -475,4 +477,20 @@ tbody tr:hover td { background: rgba(169,121,59,.035); }
   text-align: center;
   color: var(--muted);
   font-size: 13.5px;
+}
+
+/* ==========================================================================
+   تجاوب للشاشات الصغيرة
+   ========================================================================== */
+
+@media (max-width: 820px) {
+  .dashboard, .page { flex-direction: column; }
+  .dashboard > header, .page > header {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+  .dashboard > header::before, .page > header::before { display: none; }
+  .dashboard .modules { flex-direction: row; }
 }

@@ -1,21 +1,22 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { TraineeService } from '../../core/services/trainee.service';
-import { Trainee } from '../../core/models/trainee.models';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AuthService } from "../../core/services/auth.service";
+import { TraineeService } from "../../core/services/trainee.service";
+import { ModalService } from "../../core/services/modal.service";
+import { Trainee } from "../../core/models/trainee.models";
 
 @Component({
-  selector: 'app-trainees',
+  selector: "app-trainees",
   imports: [ReactiveFormsModule],
-  templateUrl: './trainees.html',
-  styleUrl: './trainees.css'
+  templateUrl: "./trainees.html",
+  styleUrl: "./trainees.css",
 })
 export class Trainees implements OnInit {
-
   private readonly fb = inject(FormBuilder);
   private readonly traineeService = inject(TraineeService);
-  private readonly auth = inject(AuthService);
+  private readonly modal = inject(ModalService);
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly trainees = signal<Trainee[]>([]);
@@ -26,12 +27,12 @@ export class Trainees implements OnInit {
   readonly formOpen = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    name: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    password: [''],
-    dateOfBirth: ['', [Validators.required]],
-    enrollmentDate: ['']
+    username: ["", [Validators.required, Validators.minLength(3)]],
+    name: ["", [Validators.required]],
+    email: ["", [Validators.required, Validators.email]],
+    password: [""],
+    dateOfBirth: ["", [Validators.required]],
+    enrollmentDate: [""],
   });
 
   ngOnInit(): void {
@@ -46,9 +47,9 @@ export class Trainees implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage.set(err?.error?.message ?? 'تعذّر تحميل المتدربين');
+        this.errorMessage.set(err?.error?.message ?? "تعذّر تحميل المتدربين");
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -56,7 +57,10 @@ export class Trainees implements OnInit {
     this.editingId.set(null);
     this.errorMessage.set(null);
     this.form.reset();
-    this.form.controls.password.setValidators([Validators.required, Validators.minLength(6)]);
+    this.form.controls.password.setValidators([
+      Validators.required,
+      Validators.minLength(6),
+    ]);
     this.form.controls.password.updateValueAndValidity();
     this.formOpen.set(true);
   }
@@ -68,9 +72,9 @@ export class Trainees implements OnInit {
       username: trainee.username,
       name: trainee.name,
       email: trainee.email,
-      password: '',
+      password: "",
       dateOfBirth: trainee.dateOfBirth,
-      enrollmentDate: trainee.enrollmentDate ?? ''
+      enrollmentDate: trainee.enrollmentDate ?? "",
     });
     this.form.controls.password.setValidators([Validators.minLength(6)]);
     this.form.controls.password.updateValueAndValidity();
@@ -100,12 +104,13 @@ export class Trainees implements OnInit {
       email: value.email,
       dateOfBirth: value.dateOfBirth,
       ...(value.password ? { password: value.password } : {}),
-      ...(value.enrollmentDate ? { enrollmentDate: value.enrollmentDate } : {})
+      ...(value.enrollmentDate ? { enrollmentDate: value.enrollmentDate } : {}),
     };
 
-    const request = id === null
-      ? this.traineeService.create(payload)
-      : this.traineeService.update(id, payload);
+    const request =
+      id === null
+        ? this.traineeService.create(payload)
+        : this.traineeService.update(id, payload);
 
     request.subscribe({
       next: () => {
@@ -115,28 +120,32 @@ export class Trainees implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.errorMessage.set(err?.error?.message ?? 'تعذّر حفظ البيانات');
-      }
+        this.errorMessage.set(err?.error?.message ?? "تعذّر حفظ البيانات");
+      },
     });
   }
 
-  remove(trainee: Trainee): void {
-    if (!confirm(`حذف المتدرّب ${trainee.name}؟`)) {
-      return;
-    }
+  async remove(trainee: Trainee): Promise<void> {
+    const ok = await this.modal.confirm(
+      "حذف المتدرّب",
+      `حذف المتدرّب ${trainee.name}؟`,
+      { danger: true, confirmText: "حذف" },
+    );
+    if (!ok) return;
 
     this.traineeService.delete(trainee.id).subscribe({
       next: () => this.load(),
-      error: (err) => this.errorMessage.set(err?.error?.message ?? 'تعذّر الحذف')
+      error: (err) =>
+        this.errorMessage.set(err?.error?.message ?? "تعذّر الحذف"),
     });
   }
 
   back(): void {
-    this.router.navigateByUrl('/admin');
+    this.router.navigateByUrl("/admin");
   }
 
   logout(): void {
     this.auth.logout();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl("/login");
   }
 }

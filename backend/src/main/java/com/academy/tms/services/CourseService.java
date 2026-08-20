@@ -82,6 +82,14 @@ public class CourseService {
         return CourseResponse.from(course, enrolled);
     }
 
+    /** يُستدعى من تدفّق حذف المدرّب لنقل الكورس إلى مدرّب بديل. */
+    @Transactional
+    public CourseResponse reassignTrainer(Long courseId, Long newTrainerId) {
+        Course course = loadCourse(courseId);
+        course.setTrainer(loadTrainer(newTrainerId));
+        return CourseResponse.from(course, enrollmentRepository.countByCourseId(courseId));
+    }
+
     @Transactional
     public void delete(Long id) {
         Course course = loadCourse(id);

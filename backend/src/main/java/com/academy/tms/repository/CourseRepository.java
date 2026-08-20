@@ -19,4 +19,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Optional<Course> findByIdWithTrainer(@Param("id") Long id);
 
     boolean existsByTitleIgnoreCase(String title);
+
+    List<Course> findAllByTrainerId(Long trainerId);
 }

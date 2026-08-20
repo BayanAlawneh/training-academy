@@ -23,6 +23,10 @@ export class CourseService {
     return this.http.put<ApiResponse<Course>>(`${this.baseUrl}/${id}`, request);
   }
 
+  reassignTrainer(courseId: number, trainerId: number): Observable<ApiResponse<Course>> {
+    return this.http.patch<ApiResponse<Course>>(`${this.baseUrl}/${courseId}/trainer`, { trainerId });
+  }
+
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${id}`);
   }

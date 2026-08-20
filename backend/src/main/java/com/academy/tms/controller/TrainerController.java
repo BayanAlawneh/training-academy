@@ -1,6 +1,7 @@
 package com.academy.tms.controller;
 
 import com.academy.tms.dto.ApiResponse;
+import com.academy.tms.dto.TrainerDeletionCheckResponse;
 import com.academy.tms.dto.TrainerRequest;
 import com.academy.tms.dto.TrainerResponse;
 import com.academy.tms.services.TrainerService;
@@ -29,6 +30,12 @@ public class TrainerController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TrainerResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok("Trainer loaded", trainerService.findById(id)));
+    }
+
+    @GetMapping("/{id}/deletion-check")
+    public ResponseEntity<ApiResponse<TrainerDeletionCheckResponse>> deletionCheck(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok("Deletion check complete", trainerService.deletionCheck(id)));
     }
 
     @PostMapping

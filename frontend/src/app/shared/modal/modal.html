@@ -1,0 +1,27 @@
+@if (modal.state(); as s) {
+  <div class="modal-backdrop" (click)="modal.cancel()">
+    <div class="modal-box" [class.modal-box--danger]="s.danger" (click)="$event.stopPropagation()">
+      <h3>{{ s.title }}</h3>
+      <p>{{ s.message }}</p>
+
+      @if (s.kind === 'select') {
+        <select class="modal-select" [ngModel]="s.selected" (ngModelChange)="onSelectChange($event)">
+          @for (opt of s.options; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      }
+
+      <div class="modal-actions">
+        @if (s.kind !== 'alert') {
+          <button class="btn-quiet" (click)="modal.cancel()">{{ s.cancelText }}</button>
+        }
+        <button
+          [class]="s.danger ? 'modal-btn-danger' : 'btn-primary'"
+          (click)="modal.confirmAction()">
+          {{ s.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

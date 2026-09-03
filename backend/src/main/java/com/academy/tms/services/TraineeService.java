@@ -8,6 +8,7 @@ import com.academy.tms.entities.Trainee;
 import com.academy.tms.entities.User;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
+import com.academy.tms.repository.AttendanceRepository;
 import com.academy.tms.repository.EnrollmentRepository;
 import com.academy.tms.repository.RoleRepository;
 import com.academy.tms.repository.TraineeRepository;
@@ -27,17 +28,20 @@ public class TraineeService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final AttendanceRepository attendanceRepository;
     private final PasswordEncoder passwordEncoder;
 
     public TraineeService(TraineeRepository traineeRepository,
                           UserRepository userRepository,
                           RoleRepository roleRepository,
                           EnrollmentRepository enrollmentRepository,
+                          AttendanceRepository attendanceRepository,
                           PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.attendanceRepository = attendanceRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -129,7 +133,7 @@ public class TraineeService {
 
     /**
      * الحذف بالترتيب الصحيح للمفاتيح الأجنبية:
-     *   التسجيلات ← ملف المتدرّب ← حساب المستخدم
+     *   الحضور ← التسجيلات ← ملف المتدرّب ← حساب المستخدم
      *
      * سابقاً كانت التسجيلات تُترك، فيرفض PostgreSQL حذف المتدرّب
      * ويُرمى DataIntegrityViolationException بلا معالجة، فيتحوّل الردّ
@@ -142,6 +146,10 @@ public class TraineeService {
     public void delete(Long id) {
         Trainee trainee = loadTrainee(id);
         User user = trainee.getUser();
+
+        // الترتيب مهم: الحضور يشير إلى المتدرّب، والتسجيلات كذلك.
+        attendanceRepository.deleteAllByTraineeId(id);
+        attendanceRepository.flush();
 
         enrollmentRepository.deleteAllByTraineeId(id);
         enrollmentRepository.flush();

@@ -1,6 +1,7 @@
 package com.academy.tms.controller;
 
 import com.academy.tms.dto.ApiResponse;
+import com.academy.tms.dto.MyAttendanceResponse;
 import com.academy.tms.dto.MyCourseResponse;
 import com.academy.tms.dto.MySummaryResponse;
 import com.academy.tms.services.TraineePortalService;
@@ -12,11 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * مسارات المتدرّب عن نفسه. SecurityConfig يحمي /api/trainee/** بدور TRAINEE،
- * والهوية تُقرأ من التوكن عبر Authentication — لا يوجد أي معرّف في الرابط،
- * فلا يمكن لمتدرّب أن يطلب بيانات متدرّب آخر.
- */
 @RestController
 @RequestMapping("/api/trainee")
 public class TraineePortalController {
@@ -28,14 +24,20 @@ public class TraineePortalController {
     }
 
     @GetMapping("/me/courses")
-    public ResponseEntity<ApiResponse<List<MyCourseResponse>>> myCourses(Authentication authentication) {
+    public ResponseEntity<ApiResponse<List<MyCourseResponse>>> myCourses(Authentication auth) {
         return ResponseEntity.ok(ApiResponse.ok(
-                "My courses loaded", portalService.myCourses(authentication.getName())));
+                "My courses loaded", portalService.myCourses(auth.getName())));
     }
 
     @GetMapping("/me/summary")
-    public ResponseEntity<ApiResponse<MySummaryResponse>> mySummary(Authentication authentication) {
+    public ResponseEntity<ApiResponse<MySummaryResponse>> mySummary(Authentication auth) {
         return ResponseEntity.ok(ApiResponse.ok(
-                "Summary loaded", portalService.mySummary(authentication.getName())));
+                "Summary loaded", portalService.mySummary(auth.getName())));
+    }
+
+    @GetMapping("/me/attendance")
+    public ResponseEntity<ApiResponse<List<MyAttendanceResponse>>> myAttendance(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "Attendance loaded", portalService.myAttendance(auth.getName())));
     }
 }

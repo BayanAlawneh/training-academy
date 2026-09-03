@@ -17,4 +17,8 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
     @Query("select t from Trainer t join fetch t.user u join fetch u.role where t.id = :id")
     Optional<Trainer> findByIdWithUser(@Param("id") Long id);
+
+    /** يربط المستخدم المسجَّل دخوله بملفّه كمدرّب — الجسر بين التوكن والبيانات. */
+    @Query("select t from Trainer t join fetch t.user u join fetch u.role where lower(u.email) = lower(:email)")
+    Optional<Trainer> findByUserEmail(@Param("email") String email);
 }

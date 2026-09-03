@@ -19,11 +19,10 @@
         </a>
       </li>
       <li>
-        <span class="soon">
+        <a routerLink="/trainee/attendance" style="display:flex; align-items:center; gap:9px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8 11h8M8 14.5h8M8 18h5"/></svg>
           حضوري
-          <span class="tag">قريباً</span>
-        </span>
+        </a>
       </li>
       <li>
         <span class="soon">
@@ -75,12 +74,12 @@
         <a routerLink="/trainee/courses" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
       </div>
 
-      <div class="card" style="opacity:.55;">
+      <div class="card">
         <h2 style="margin-bottom:6px;">حضوري</h2>
         <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          سجلّ حضورك وغيابك في جلسات كل كورس.
+          سجلّ حضورك وغيابك في جلسات كل كورس، ونسبة حضورك.
         </p>
-        <button class="btn-quiet" disabled>قريباً</button>
+        <a routerLink="/trainee/attendance" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
       </div>
 
       <div class="card" style="opacity:.55;">

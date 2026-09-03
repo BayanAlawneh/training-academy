@@ -6,6 +6,8 @@ import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 import { TrainerDashboard } from './pages/trainer-dashboard/trainer-dashboard';
 import { TraineeDashboard } from './pages/trainee-dashboard/trainee-dashboard';
 import { MyCourses } from './pages/my-courses/my-courses';
+import { MyAttendancePage } from './pages/my-attendance/my-attendance';
+import { TrainerSessions } from './pages/trainer-sessions/trainer-sessions';
 import { Trainers } from './pages/trainers/trainers';
 import { Trainees } from './pages/trainees/trainees';
 import { Courses } from './pages/courses/courses';
@@ -63,6 +65,18 @@ export const routes: Routes = [
     component: MyCourses,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['TRAINEE'] }
+  },
+  {
+    path: 'trainee/attendance',
+    component: MyAttendancePage,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINEE'] }
+  },
+  {
+    path: 'trainer/sessions',
+    component: TrainerSessions,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINER'] }
   },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },

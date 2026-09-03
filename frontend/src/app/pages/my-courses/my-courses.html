@@ -1,4 +1,4 @@
-<div class="dashboard">
+<div class="page">
   <header>
     <div style="display:flex; align-items:center; gap:8px; margin-bottom:26px;">
       <div class="brand-mark">TA</div>
@@ -7,13 +7,13 @@
 
     <ul class="modules">
       <li>
-        <a routerLink="/trainee" class="active" style="display:flex; align-items:center; gap:9px;">
+        <a routerLink="/trainee" style="display:flex; align-items:center; gap:9px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5"/><path d="M5 10v10h14V10"/></svg>
           لوحتي
         </a>
       </li>
       <li>
-        <a routerLink="/trainee/courses" style="display:flex; align-items:center; gap:9px;">
+        <a routerLink="/trainee/courses" class="active" style="display:flex; align-items:center; gap:9px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4.5C4 3.7 4.7 3 5.5 3H12v18H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 4.5c0-.8-.7-1.5-1.5-1.5H12v18h6.5c.8 0 1.5-.7 1.5-1.5z"/></svg>
           كورساتي
         </a>
@@ -41,55 +41,73 @@
   </header>
 
   <div class="content-area">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:26px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
       <div>
-        <p class="hint" style="font-family:var(--font-mono); letter-spacing:.07em; margin-bottom:2px;">لوحة المتدرّب</p>
-        <h1>مرحباً، {{ auth.user()?.name }}</h1>
+        <p class="hint" style="font-family:var(--font-mono); letter-spacing:.07em; margin-bottom:2px;">بوابة المتدرّب</p>
+        <h1>كورساتي</h1>
       </div>
-      <button class="btn-quiet" (click)="logout()">خروج</button>
+      <div class="actions">
+        <button class="btn-quiet" (click)="load()">تحديث</button>
+        <button class="btn-quiet" (click)="logout()">خروج</button>
+      </div>
     </div>
 
     @if (errorMessage()) {
       <div class="alert">{{ errorMessage() }}</div>
     }
 
-    @if (summary(); as s) {
+    @if (loading()) {
+      <div class="card"><p style="margin:0; color:var(--muted);">جارٍ التحميل…</p></div>
+    }
+
+    @if (!loading() && !errorMessage()) {
       <div class="stat-row">
         <div class="stat">
-          <div class="value">{{ s.courseCount }}</div>
+          <div class="value">{{ courses().length }}</div>
           <div class="label">كورس مسجَّل</div>
-        </div>
-        <div class="stat">
-          <div class="value" style="font-size:17px; padding-top:6px;">{{ formatDate(s.memberSince) }}</div>
-          <div class="label">تاريخ الانضمام</div>
         </div>
       </div>
     }
 
-    <div class="grid">
+    @if (isEmpty() && !errorMessage()) {
       <div class="card">
-        <h2 style="margin-bottom:6px;">كورساتي</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          الكورسات التي سجّلك فيها مدير النظام، مع مدرّب كل كورس.
-        </p>
-        <a routerLink="/trainee/courses" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
+        <div class="empty-state">
+          <div class="mark">—</div>
+          <p>لم يسجّلك مدير النظام في أي كورس بعد.</p>
+        </div>
       </div>
+    }
 
-      <div class="card" style="opacity:.55;">
-        <h2 style="margin-bottom:6px;">حضوري</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          سجلّ حضورك وغيابك في جلسات كل كورس.
-        </p>
-        <button class="btn-quiet" disabled>قريباً</button>
+    @if (courses().length > 0) {
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الكورس</th>
+              <th>المدرّب</th>
+              <th>السعة</th>
+              <th>تاريخ التسجيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (course of courses(); track course.enrollmentId; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td class="course-title">{{ course.title }}</td>
+                <td class="trainer-cell">
+                  <span class="name">{{ course.trainerName }}</span>
+                  @if (course.trainerSpecialization) {
+                    <span class="spec">{{ course.trainerSpecialization }}</span>
+                  }
+                </td>
+                <td>{{ course.capacity }}</td>
+                <td class="date-cell">{{ formatDate(course.enrolledOn) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
-
-      <div class="card" style="opacity:.55;">
-        <h2 style="margin-bottom:6px;">اختباراتي</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          اختبارات كورساتك وعلاماتك بعد تقديمها.
-        </p>
-        <button class="btn-quiet" disabled>قريباً</button>
-      </div>
-    </div>
+    }
   </div>
 </div>

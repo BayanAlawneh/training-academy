@@ -1,40 +1,49 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { PortalService } from '../../core/services/portal.service';
-import { MySummary } from '../../core/models/portal.models';
+import { MyCourse } from '../../core/models/portal.models';
 
 @Component({
-  selector: 'app-trainee-dashboard',
+  selector: 'app-my-courses',
   imports: [RouterLink],
-  templateUrl: './trainee-dashboard.html',
-  styleUrl: './trainee-dashboard.css'
+  templateUrl: './my-courses.html',
+  styleUrl: './my-courses.css'
 })
-export class TraineeDashboard implements OnInit {
+export class MyCourses implements OnInit {
 
   readonly auth = inject(AuthService);
   private readonly portal = inject(PortalService);
   private readonly router = inject(Router);
 
-  readonly summary = signal<MySummary | null>(null);
+  readonly courses = signal<MyCourse[]>([]);
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  readonly isEmpty = computed(() => !this.loading() && this.courses().length === 0);
+
   ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
     this.loading.set(true);
-    this.portal.mySummary().subscribe({
+    this.errorMessage.set(null);
+
+    this.portal.myCourses().subscribe({
       next: (response) => {
-        this.summary.set(response.data);
+        this.courses.set(response.data);
         this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage.set(err?.error?.message ?? 'تعذّر تحميل بياناتك');
+        this.errorMessage.set(err?.error?.message ?? 'تعذّر تحميل الكورسات');
         this.loading.set(false);
       }
     });
   }
 
-  formatDate(value: string | null | undefined): string {
+  /** 2026-03-14 → 14 / 03 / 2026 */
+  formatDate(value: string | null): string {
     if (!value) return '—';
     const parts = value.split('-');
     if (parts.length !== 3) return value;

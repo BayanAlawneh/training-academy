@@ -5,6 +5,7 @@ import { Signup } from './pages/signup/signup';
 import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 import { TrainerDashboard } from './pages/trainer-dashboard/trainer-dashboard';
 import { TraineeDashboard } from './pages/trainee-dashboard/trainee-dashboard';
+import { MyCourses } from './pages/my-courses/my-courses';
 import { Trainers } from './pages/trainers/trainers';
 import { Trainees } from './pages/trainees/trainees';
 import { Courses } from './pages/courses/courses';
@@ -54,6 +55,12 @@ export const routes: Routes = [
   {
     path: 'trainee',
     component: TraineeDashboard,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINEE'] }
+  },
+  {
+    path: 'trainee/courses',
+    component: MyCourses,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['TRAINEE'] }
   },

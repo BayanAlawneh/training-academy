@@ -23,6 +23,11 @@ export class TraineeService {
     return this.http.put<ApiResponse<Trainee>>(`${this.baseUrl}/${id}`, request);
   }
 
+  /** يرجع عدد الكورسات المسجَّل فيها المتدرّب قبل الحذف. */
+  deletionCheck(id: number): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.baseUrl}/${id}/deletion-check`);
+  }
+
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${id}`);
   }

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
 import { CourseService } from "../../core/services/course.service";
 import { TraineeService } from "../../core/services/trainee.service";
@@ -11,7 +11,7 @@ import { Enrollment } from "../../core/models/enrollment.models";
 
 @Component({
   selector: "app-enrollments",
-  imports: [],
+  imports: [RouterLink],
   templateUrl: "./enrollments.html",
   styleUrl: "./enrollments.css",
 })

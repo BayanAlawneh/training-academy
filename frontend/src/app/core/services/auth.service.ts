@@ -23,7 +23,8 @@ export class AuthService {
       .post<ApiResponse<LoginResult>>(`${environment.apiUrl}/auth/login`, credentials)
       .pipe(tap(response => this.storeSession(response.data)));
   }
-signup(request: SignupRequest): Observable<ApiResponse<LoginResult>> {
+
+  signup(request: SignupRequest): Observable<ApiResponse<LoginResult>> {
     return this.http
       .post<ApiResponse<LoginResult>>(`${environment.apiUrl}/auth/signup`, request)
       .pipe(tap(response => this.storeSession(response.data)));
@@ -57,12 +58,43 @@ signup(request: SignupRequest): Observable<ApiResponse<LoginResult>> {
     this.userSignal.set(user);
   }
 
+  /**
+   * يقرأ تاريخ انتهاء التوكن من الحمولة (claim اسمه exp، بالثواني).
+   * لا يتحقّق من التوقيع — هذا شأن الخادم — بل يمنع فقط الحالة التي
+   * يبدو فيها المستخدم مسجّل الدخول بينما توكنه منتهٍ، فتفشل كل الطلبات.
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) return true;
+
+      const normalised = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = JSON.parse(
+        decodeURIComponent(
+          atob(normalised)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        )
+      );
+
+      if (typeof decoded.exp !== 'number') return false;
+      return decoded.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
+  }
+
   private restoreUser(): AuthUser | null {
     const raw = localStorage.getItem(USER_KEY);
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!raw || !token) {
+
+    if (!raw || !token || this.isTokenExpired(token)) {
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(TOKEN_KEY);
       return null;
     }
+
     try {
       return JSON.parse(raw) as AuthUser;
     } catch {

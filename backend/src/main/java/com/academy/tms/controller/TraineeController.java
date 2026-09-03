@@ -31,6 +31,13 @@ public class TraineeController {
         return ResponseEntity.ok(ApiResponse.ok("Trainee loaded", traineeService.findById(id)));
     }
 
+    /** عدد الكورسات المسجَّل فيها المتدرّب — يُستخدم لرسالة تأكيد الحذف. */
+    @GetMapping("/{id}/deletion-check")
+    public ResponseEntity<ApiResponse<Long>> deletionCheck(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok("Deletion check complete", traineeService.enrollmentCount(id)));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<TraineeResponse>> create(@Valid @RequestBody TraineeRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)

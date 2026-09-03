@@ -54,6 +54,8 @@ public class CourseService {
         }
 
         Trainer trainer = loadTrainer(request.getTrainerId());
+        assertTrainerIsFree(trainer, null);
+
         Course course = new Course(request.getTitle(), request.getCapacity(), trainer);
 
         return CourseResponse.from(courseRepository.save(course), 0L);
@@ -75,9 +77,14 @@ public class CourseService {
                     "Capacity cannot be lower than the number of enrolled trainees (" + enrolled + ")");
         }
 
+        Trainer newTrainer = loadTrainer(request.getTrainerId());
+        if (!newTrainer.getId().equals(course.getTrainer().getId())) {
+            assertTrainerIsFree(newTrainer, id);
+        }
+
         course.setTitle(request.getTitle());
         course.setCapacity(request.getCapacity());
-        course.setTrainer(loadTrainer(request.getTrainerId()));
+        course.setTrainer(newTrainer);
 
         return CourseResponse.from(course, enrolled);
     }
@@ -86,7 +93,14 @@ public class CourseService {
     @Transactional
     public CourseResponse reassignTrainer(Long courseId, Long newTrainerId) {
         Course course = loadCourse(courseId);
-        course.setTrainer(loadTrainer(newTrainerId));
+        Trainer newTrainer = loadTrainer(newTrainerId);
+
+        if (newTrainer.getId().equals(course.getTrainer().getId())) {
+            throw new IllegalArgumentException("This course is already assigned to that trainer");
+        }
+        assertTrainerIsFree(newTrainer, courseId);
+
+        course.setTrainer(newTrainer);
         return CourseResponse.from(course, enrollmentRepository.countByCourseId(courseId));
     }
 
@@ -101,6 +115,21 @@ public class CourseService {
         }
 
         courseRepository.delete(course);
+    }
+
+    /**
+     * قاعدة المشرف: كل مدرّب يستلم كورساً واحداً فقط.
+     * excludeCourseId يسمح باستثناء الكورس الجاري تعديله من الفحص.
+     */
+    private void assertTrainerIsFree(Trainer trainer, Long excludeCourseId) {
+        boolean busy = courseRepository.findAllByTrainerId(trainer.getId()).stream()
+                .anyMatch(c -> excludeCourseId == null || !c.getId().equals(excludeCourseId));
+
+        if (busy) {
+            throw new IllegalStateException(
+                    "Trainer " + trainer.getUser().getName()
+                            + " is already assigned to a course. Each trainer may hold only one course.");
+        }
     }
 
     private Map<Long, Long> enrolledCountsByCourse() {

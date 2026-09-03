@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TrainerService {
@@ -114,8 +116,11 @@ public class TrainerService {
     }
 
     /**
-     * يُستدعى من الفرونت اند قبل محاولة الحذف، ليعرف إذا كان المدرّب
-     * يدرّس كورسات حالياً، وإذا كان في مدربين بدلاء متاحين.
+     * يُستدعى قبل الحذف. يرجع كورسات المدرّب، والمدربين البدلاء المتاحين.
+     *
+     * تصحيح مهم: البديل يجب أن يكون مدرّباً *غير مستلم لأي كورس*، احتراماً
+     * لقاعدة "كل مدرّب يستلم كورساً واحداً فقط". سابقاً كانت القائمة تضم كل
+     * المدربين، فيختار الأدمن مدرّباً مشغولاً فيفشل النقل.
      */
     @Transactional(readOnly = true)
     public TrainerDeletionCheckResponse deletionCheck(Long id) {
@@ -126,28 +131,37 @@ public class TrainerService {
                 .map(CourseBriefResponse::from)
                 .toList();
 
+        Set<Long> busyTrainerIds = new HashSet<>(courseRepository.findAllAssignedTrainerIds());
+
         List<TrainerBriefResponse> alternatives = trainerRepository.findAllWithUser().stream()
                 .filter(t -> !t.getId().equals(id))
+                .filter(t -> !busyTrainerIds.contains(t.getId()))
                 .map(TrainerBriefResponse::from)
                 .toList();
 
         return new TrainerDeletionCheckResponse(courses, alternatives);
     }
 
+    /**
+     * الحذف بالترتيب الصحيح: ملف المدرّب ثم حساب المستخدم، مع flush()
+     * بينهما حتى لا يعكس Hibernate الترتيب فيفشل قيد المفتاح الأجنبي.
+     */
     @Transactional
     public void delete(Long id) {
         Trainer trainer = loadTrainer(id);
 
-        // حارس أخير على مستوى السيرفر — حتى لو تجاوز أحد صفحة الفرونت اند
-        // وطلب الحذف مباشرة، ما بنسمح بحذف مدرّب لسا مسؤول عن كورس.
-        if (!courseRepository.findAllByTrainerId(id).isEmpty()) {
+        if (courseRepository.existsByTrainerId(id)) {
             throw new IllegalArgumentException(
-                    "This trainer is currently assigned to one or more courses. Reassign those courses first.");
+                    "This trainer is currently assigned to a course. Reassign that course first.");
         }
 
         User user = trainer.getUser();
+
         trainerRepository.delete(trainer);
+        trainerRepository.flush();
+
         userRepository.delete(user);
+        userRepository.flush();
     }
 
     private Trainer loadTrainer(Long id) {

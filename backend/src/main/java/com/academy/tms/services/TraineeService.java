@@ -8,6 +8,7 @@ import com.academy.tms.entities.Trainee;
 import com.academy.tms.entities.User;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
+import com.academy.tms.repository.EnrollmentRepository;
 import com.academy.tms.repository.RoleRepository;
 import com.academy.tms.repository.TraineeRepository;
 import com.academy.tms.repository.UserRepository;
@@ -25,15 +26,18 @@ public class TraineeService {
     private final TraineeRepository traineeRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     public TraineeService(TraineeRepository traineeRepository,
                           UserRepository userRepository,
                           RoleRepository roleRepository,
+                          EnrollmentRepository enrollmentRepository,
                           PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.enrollmentRepository = enrollmentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -113,12 +117,40 @@ public class TraineeService {
         return TraineeResponse.from(trainee);
     }
 
+    /**
+     * كم كورساً مسجَّل فيه هذا المتدرّب — يستدعيه الفرونت اند قبل الحذف
+     * ليعرض رسالة تأكيد دقيقة بدل رسالة عامة.
+     */
+    @Transactional(readOnly = true)
+    public long enrollmentCount(Long id) {
+        loadTrainee(id);
+        return enrollmentRepository.countByTraineeId(id);
+    }
+
+    /**
+     * الحذف بالترتيب الصحيح للمفاتيح الأجنبية:
+     *   التسجيلات ← ملف المتدرّب ← حساب المستخدم
+     *
+     * سابقاً كانت التسجيلات تُترك، فيرفض PostgreSQL حذف المتدرّب
+     * ويُرمى DataIntegrityViolationException بلا معالجة، فيتحوّل الردّ
+     * إلى 401 ويُطرد الأدمن من النظام.
+     *
+     * flush() بعد كل خطوة يفرض على Hibernate تنفيذ الحذف بالترتيب المكتوب
+     * بدل ترتيبه الداخلي، وهذا يمنع فشل حذف (trainee ← user) أيضاً.
+     */
     @Transactional
     public void delete(Long id) {
         Trainee trainee = loadTrainee(id);
         User user = trainee.getUser();
+
+        enrollmentRepository.deleteAllByTraineeId(id);
+        enrollmentRepository.flush();
+
         traineeRepository.delete(trainee);
+        traineeRepository.flush();
+
         userRepository.delete(user);
+        userRepository.flush();
     }
 
     private Trainee loadTrainee(Long id) {

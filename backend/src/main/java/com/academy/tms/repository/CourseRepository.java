@@ -21,4 +21,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByTitleIgnoreCase(String title);
 
     List<Course> findAllByTrainerId(Long trainerId);
+
+    /** أساس قاعدة "كل مدرّب يستلم كورساً واحداً فقط". */
+    boolean existsByTrainerId(Long trainerId);
+
+    /** معرّفات كل المدربين المشغولين بكورس — لحساب المدربين المتاحين. */
+    @Query("select distinct c.trainer.id from Course c")
+    List<Long> findAllAssignedTrainerIds();
+
+    /** كورس المدرّب الحالي — أساس لوحة المدرّب. */
+    @Query("select c from Course c join fetch c.trainer t join fetch t.user u where u.id = :userId")
+    List<Course> findAllByTrainerUserId(@Param("userId") Long userId);
 }

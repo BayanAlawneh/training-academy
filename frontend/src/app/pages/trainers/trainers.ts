@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { AuthService } from "../../core/services/auth.service";
 import { TrainerService } from "../../core/services/trainer.service";
@@ -10,7 +10,7 @@ import { Trainer } from "../../core/models/trainer.models";
 
 @Component({
   selector: "app-trainers",
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: "./trainers.html",
   styleUrl: "./trainers.css",
 })

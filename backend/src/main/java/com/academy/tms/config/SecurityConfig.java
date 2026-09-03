@@ -59,6 +59,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // مهم: /error هو المسار الذي يحوّل إليه Spring أي خطأ غير معالَج.
+                        // لو بقي محمياً، فأي خطأ 500 يعود للمتصفح كـ 401 فيُطرد المستخدم.
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/trainer/**").hasRole("TRAINER")
                         .requestMatchers("/api/trainee/**").hasRole("TRAINEE")
@@ -73,7 +76,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(allowedOrigin));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // PATCH كانت ناقصة، وهي الفعل المستخدم في نقل الكورس لمدرّب بديل
+        // (@PatchMapping("/{id}/trainer")). بدونها يرفض المتصفح الطلب في مرحلة
+        // الـ preflight فلا يصل الخادم إطلاقاً، ويرى Angular الحالة 0.
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

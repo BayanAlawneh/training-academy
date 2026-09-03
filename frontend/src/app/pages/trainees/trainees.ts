@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { firstValueFrom } from "rxjs";
 import { AuthService } from "../../core/services/auth.service";
 import { TraineeService } from "../../core/services/trainee.service";
 import { ModalService } from "../../core/services/modal.service";
@@ -8,7 +9,7 @@ import { Trainee } from "../../core/models/trainee.models";
 
 @Component({
   selector: "app-trainees",
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: "./trainees.html",
   styleUrl: "./trainees.css",
 })
@@ -125,12 +126,35 @@ export class Trainees implements OnInit {
     });
   }
 
+  /**
+   * حذف المتدرّب: نسأل الخادم أولاً كم كورساً هو مسجَّل فيه،
+   * ونعرض ذلك بوضوح في نافذة التأكيد. الحذف نفسه يلغي التسجيلات تلقائياً.
+   */
   async remove(trainee: Trainee): Promise<void> {
-    const ok = await this.modal.confirm(
-      "حذف المتدرّب",
-      `حذف المتدرّب ${trainee.name}؟`,
-      { danger: true, confirmText: "حذف" },
-    );
+    this.errorMessage.set(null);
+
+    let enrolledCount = 0;
+    try {
+      const response = await firstValueFrom(
+        this.traineeService.deletionCheck(trainee.id),
+      );
+      enrolledCount = response.data ?? 0;
+    } catch (err: any) {
+      this.errorMessage.set(
+        err?.error?.message ?? "تعذّر التحقّق من بيانات المتدرّب",
+      );
+      return;
+    }
+
+    const message =
+      enrolledCount > 0
+        ? `${trainee.name} مسجَّل حالياً في ${enrolledCount} كورس. حذفه سيلغي هذه التسجيلات نهائياً. هل أنت متأكد؟`
+        : `هل أنت متأكد من حذف ${trainee.name}؟`;
+
+    const ok = await this.modal.confirm("حذف المتدرّب", message, {
+      danger: true,
+      confirmText: "حذف",
+    });
     if (!ok) return;
 
     this.traineeService.delete(trainee.id).subscribe({

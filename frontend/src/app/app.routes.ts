@@ -8,6 +8,9 @@ import { TraineeDashboard } from './pages/trainee-dashboard/trainee-dashboard';
 import { MyCourses } from './pages/my-courses/my-courses';
 import { MyAttendancePage } from './pages/my-attendance/my-attendance';
 import { TrainerSessions } from './pages/trainer-sessions/trainer-sessions';
+import { MyExams } from './pages/my-exams/my-exams';
+import { TakeExam } from './pages/take-exam/take-exam';
+import { TrainerExams } from './pages/trainer-exams/trainer-exams';
 import { Trainers } from './pages/trainers/trainers';
 import { Trainees } from './pages/trainees/trainees';
 import { Courses } from './pages/courses/courses';
@@ -77,6 +80,24 @@ export const routes: Routes = [
     component: TrainerSessions,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['TRAINER'] }
+  },
+  {
+    path: 'trainer/exams',
+    component: TrainerExams,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINER'] }
+  },
+  {
+    path: 'trainee/exams',
+    component: MyExams,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINEE'] }
+  },
+  {
+    path: 'trainee/exams/:id',
+    component: TakeExam,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['TRAINEE'] }
   },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },

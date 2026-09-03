@@ -1,0 +1,76 @@
+<div class="exam-shell">
+
+  @if (loading()) {
+    <p style="color:var(--muted);">جارٍ فتح الاختبار…</p>
+  }
+
+  @if (errorMessage() && !result()) {
+    <div class="alert">{{ errorMessage() }}</div>
+    <button class="btn-quiet" (click)="back()">رجوع لاختباراتي</button>
+  }
+
+  @if (result(); as r) {
+    <div class="result-card">
+      <p class="hint" style="font-family:var(--font-mono); letter-spacing:.07em;">تم التسليم</p>
+      <h2 style="margin:6px 0 20px;">{{ r.examTitle }}</h2>
+
+      <div class="result-score">{{ r.score }}<span class="result-of"> / {{ r.totalMarks }}</span></div>
+      <p class="result-pct">{{ percent() }}% — إجابات صحيحة: {{ r.correctCount }} من {{ r.questionCount }}</p>
+
+      <button class="btn-primary" (click)="back()">العودة لاختباراتي</button>
+    </div>
+  }
+
+  @if (paper(); as p) {
+    @if (!result()) {
+      <div class="exam-top">
+        <div>
+          <h1 style="font-size:23px; margin:0;">{{ p.title }}</h1>
+          <span class="progress-line">
+            أجبتِ عن {{ answeredCount() }} من {{ p.questions.length }} — العلامة الكاملة {{ p.totalMarks }}
+          </span>
+        </div>
+        <div class="timer" [class.urgent]="urgent()">{{ timeLabel() }}</div>
+      </div>
+
+      @if (p.description) {
+        <p style="color:var(--muted); margin:0 0 20px; font-size:14px;">{{ p.description }}</p>
+      }
+
+      @if (errorMessage()) { <div class="alert">{{ errorMessage() }}</div> }
+
+      @for (q of p.questions; track q.id; let i = $index) {
+        <div class="q-card" [class.answered]="isAnswered(q.id)">
+          <div class="q-head">
+            <div>
+              <div class="q-num">سؤال {{ i + 1 }}</div>
+              <p class="q-text">{{ q.text }}</p>
+            </div>
+            <span class="q-marks">{{ q.marks }} علامة</span>
+          </div>
+
+          @for (opt of q.options; track opt.id) {
+            <button type="button" class="opt" [class.on]="isChosen(q.id, opt.id)"
+                    (click)="choose(q.id, opt.id)">
+              <span class="dot"></span>
+              <span>{{ opt.text }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="submit-bar">
+        <button class="btn-primary" [disabled]="submitting()" (click)="submit()">
+          {{ submitting() ? 'جارٍ التسليم…' : 'تسليم الاختبار' }}
+        </button>
+        @if (!allAnswered()) {
+          <span class="hint">تبقّى {{ p.questions.length - answeredCount() }} سؤال بلا إجابة</span>
+        }
+      </div>
+
+      <p class="hint" style="margin-top:18px;">
+        عند انتهاء الوقت يُسلَّم الاختبار تلقائياً بالإجابات المحدَّدة.
+      </p>
+    }
+  }
+</div>

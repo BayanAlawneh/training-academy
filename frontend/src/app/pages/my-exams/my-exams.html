@@ -14,11 +14,11 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4.5C4 3.7 4.7 3 5.5 3H12v18H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 4.5c0-.8-.7-1.5-1.5-1.5H12v18h6.5c.8 0 1.5-.7 1.5-1.5z"/></svg>
         كورساتي
       </a></li>
-      <li><a routerLink="/trainee/attendance" class="active" style="display:flex; align-items:center; gap:9px;">
+      <li><a routerLink="/trainee/attendance" style="display:flex; align-items:center; gap:9px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8 11h8M8 14.5h8M8 18h5"/></svg>
         حضوري
       </a></li>
-      <li><a routerLink="/trainee/exams" style="display:flex; align-items:center; gap:9px;">
+      <li><a routerLink="/trainee/exams" class="active" style="display:flex; align-items:center; gap:9px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3.5v6c0 4.4-3 7.7-7 8.5-4-.8-7-4.1-7-8.5v-6z"/><path d="M9 12l2 2 4-4"/></svg>
         اختباراتي
       </a></li>
@@ -34,7 +34,7 @@
     <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
       <div>
         <p class="hint" style="font-family:var(--font-mono); letter-spacing:.07em; margin-bottom:2px;">بوابة المتدرّب</p>
-        <h1>حضوري</h1>
+        <h1>اختباراتي</h1>
       </div>
       <div class="actions">
         <button class="btn-quiet" (click)="load()">تحديث</button>
@@ -42,69 +42,62 @@
       </div>
     </div>
 
-    @if (errorMessage()) {
-      <div class="alert">{{ errorMessage() }}</div>
-    }
+    @if (errorMessage()) { <div class="alert">{{ errorMessage() }}</div> }
+    @if (loading()) { <div class="card"><p style="margin:0; color:var(--muted);">جارٍ التحميل…</p></div> }
 
-    @if (loading()) {
-      <div class="card"><p style="margin:0; color:var(--muted);">جارٍ التحميل…</p></div>
-    }
-
-    @if (!loading() && !errorMessage() && rows().length > 0) {
+    @if (!loading() && !errorMessage() && exams().length > 0) {
       <div class="stat-row">
         <div class="stat accent">
-          <div class="value">{{ rate() === null ? '—' : rate() + '%' }}</div>
-          <div class="label">نسبة الحضور</div>
+          <div class="value">{{ average() === null ? '—' : average() + '%' }}</div>
+          <div class="label">المعدّل</div>
         </div>
-        <div class="stat"><div class="value">{{ present() }}</div><div class="label">حاضر</div></div>
-        <div class="stat"><div class="value">{{ late() }}</div><div class="label">متأخر</div></div>
-        <div class="stat"><div class="value">{{ absent() }}</div><div class="label">غائب</div></div>
-        <div class="stat"><div class="value">{{ rows().length }}</div><div class="label">إجمالي الجلسات</div></div>
+        <div class="stat"><div class="value">{{ submitted().length }}</div><div class="label">مُسلَّم</div></div>
+        <div class="stat"><div class="value">{{ exams().length }}</div><div class="label">إجمالي الاختبارات</div></div>
       </div>
     }
 
-    @if (isEmpty() && !errorMessage()) {
+    @if (!loading() && exams().length === 0 && !errorMessage()) {
       <div class="card">
         <div class="empty-state">
           <div class="mark">—</div>
-          <p>لا توجد جلسات مجدولة في كورساتك بعد.</p>
+          <p>لا توجد اختبارات منشورة في كورساتك بعد.</p>
         </div>
       </div>
     }
 
-    @if (rows().length > 0) {
+    @if (exams().length > 0) {
       <div class="card">
         <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>الجلسة</th>
-              <th>التاريخ</th>
-              <th>الوقت</th>
-              <th>الحالة</th>
-              <th>اللقاء</th>
+              <th>#</th><th>الاختبار</th><th>يفتح</th><th>يُغلق</th>
+              <th>الحالة</th><th>العلامة</th><th></th>
             </tr>
           </thead>
           <tbody>
-            @for (row of rows(); track row.sessionId; let i = $index) {
-              <tr [class.upcoming]="isUpcoming(row)">
+            @for (exam of exams(); track exam.examId; let i = $index) {
+              <tr>
                 <td>{{ i + 1 }}</td>
                 <td>
-                  <span class="session-title">{{ row.sessionTitle }}</span>
-                  <span class="course-tag">{{ row.courseTitle }}</span>
+                  <span class="exam-title">{{ exam.title }}</span>
+                  <span class="course-tag">{{ exam.courseTitle }} — {{ exam.questionCount }} سؤال</span>
                 </td>
-                <td class="date-cell">{{ formatDate(row.sessionDate) }}</td>
-                <td class="time-cell">{{ formatTime(row.startTime) }} – {{ formatTime(row.endTime) }}</td>
+                <td class="dt">{{ formatDateTime(exam.opensAt) }}</td>
+                <td class="dt">{{ formatDateTime(exam.closesAt) }}</td>
                 <td>
-                  <span class="badge-att" [class]="'badge-att ' + badgeClass(row.attendanceStatus)">
-                    {{ label(row.attendanceStatus) }}
-                  </span>
+                  <span [class]="'badge-x ' + badgeClass(exam.state)">{{ label(exam.state) }}</span>
                 </td>
                 <td>
-                  @if (row.meetingLink) {
-                    <a class="link-btn" [href]="row.meetingLink" target="_blank" rel="noopener">فتح</a>
+                  @if (exam.score !== null) {
+                    <span class="score-cell">{{ exam.score }}<span class="of"> / {{ exam.totalMarks }}</span></span>
+                    <span class="score-pct">{{ percent(exam) }}%</span>
                   } @else {
                     <span style="color:var(--muted-2);">—</span>
+                  }
+                </td>
+                <td>
+                  @if (exam.state === 'OPEN') {
+                    <button class="btn-primary" (click)="start(exam)">ابدأ</button>
                   }
                 </td>
               </tr>
@@ -114,7 +107,7 @@
       </div>
 
       <p class="hint" style="margin-top:12px;">
-        نسبة الحضور تُحتسب من الجلسات التي سجّلها المدرّب فقط. الجلسات القادمة لا تُحسب غياباً.
+        الاختبار متاح داخل نافذته الزمنية فقط. من لم يسلّم قبل الإغلاق تُحتسب له علامة صفر.
       </p>
     }
   </div>

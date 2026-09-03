@@ -9,6 +9,7 @@ import com.academy.tms.entities.User;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.AttendanceRepository;
+import com.academy.tms.repository.SubmissionRepository;
 import com.academy.tms.repository.EnrollmentRepository;
 import com.academy.tms.repository.RoleRepository;
 import com.academy.tms.repository.TraineeRepository;
@@ -29,6 +30,7 @@ public class TraineeService {
     private final RoleRepository roleRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final AttendanceRepository attendanceRepository;
+    private final SubmissionRepository submissionRepository;
     private final PasswordEncoder passwordEncoder;
 
     public TraineeService(TraineeRepository traineeRepository,
@@ -36,12 +38,14 @@ public class TraineeService {
                           RoleRepository roleRepository,
                           EnrollmentRepository enrollmentRepository,
                           AttendanceRepository attendanceRepository,
+                          SubmissionRepository submissionRepository,
                           PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.attendanceRepository = attendanceRepository;
+        this.submissionRepository = submissionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -133,7 +137,7 @@ public class TraineeService {
 
     /**
      * الحذف بالترتيب الصحيح للمفاتيح الأجنبية:
-     *   الحضور ← التسجيلات ← ملف المتدرّب ← حساب المستخدم
+     *   الإجابات ← التسليمات ← الحضور ← التسجيلات ← الملف ← الحساب
      *
      * سابقاً كانت التسجيلات تُترك، فيرفض PostgreSQL حذف المتدرّب
      * ويُرمى DataIntegrityViolationException بلا معالجة، فيتحوّل الردّ
@@ -147,7 +151,14 @@ public class TraineeService {
         Trainee trainee = loadTrainee(id);
         User user = trainee.getUser();
 
-        // الترتيب مهم: الحضور يشير إلى المتدرّب، والتسجيلات كذلك.
+        // الترتيب مهم: الإجابات تشير إلى التسليمات، والتسليمات والحضور
+        // والتسجيلات كلها تشير إلى المتدرّب. أي واحد يُترك يُفشل الحذف.
+        submissionRepository.deleteAnswersByTraineeId(id);
+        submissionRepository.flush();
+
+        submissionRepository.deleteAllByTraineeId(id);
+        submissionRepository.flush();
+
         attendanceRepository.deleteAllByTraineeId(id);
         attendanceRepository.flush();
 

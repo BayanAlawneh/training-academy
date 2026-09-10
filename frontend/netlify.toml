@@ -2,7 +2,7 @@
 
 [build]
   base    = "frontend"
-  command = "npm ci && npm run build -- --configuration production"
+  command = "npm ci && npx ng build --configuration production"
   publish = "dist/frontend/browser"
 
 [build.environment]

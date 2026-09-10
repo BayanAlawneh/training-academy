@@ -33,6 +33,7 @@
     </ul>
 
     <div style="margin-top:auto; display:flex; align-items:center; gap:9px; padding-top:16px; border-top:1px solid rgba(231,237,232,.14);">
+      <app-notification-bell></app-notification-bell>
       <div class="role">{{ auth.role()?.charAt(0) }}</div>
       <span style="color:var(--on-ink); font-size:12.5px; font-weight:600;">{{ auth.user()?.name }}</span>
     </div>
@@ -47,27 +48,62 @@
       <button class="btn-quiet" (click)="logout()">خروج</button>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2 style="margin-bottom:6px;">إدارة المدربين</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">إضافة وتعديل وحذف حسابات المدربين.</p>
-        <a routerLink="/admin/trainers" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
+    @if (errorMessage()) { <div class="alert">{{ errorMessage() }}</div> }
+
+    @if (loading()) {
+      <div class="card"><p style="margin:0; color:var(--muted);">جارٍ تحميل الملخّص…</p></div>
+    } @else {
+      <div class="grid">
+
+        <a class="module-card" routerLink="/admin/trainers">
+          <div class="stat-line">
+            <span class="stat-num">{{ trainers() }}</span>
+            <span class="stat-unit">مدرّب</span>
+          </div>
+          <h2>المدربون</h2>
+          <p>
+            @if (freeTrainers() > 0) {
+              {{ freeTrainers() }} منهم بلا كورس مُسنَد.
+            } @else {
+              جميع المدربين مُسنَد إليهم كورسات.
+            }
+          </p>
+        </a>
+
+        <a class="module-card" routerLink="/admin/trainees">
+          <div class="stat-line">
+            <span class="stat-num">{{ trainees() }}</span>
+            <span class="stat-unit">متدرّب</span>
+          </div>
+          <h2>المتدربون</h2>
+          <p>حسابات المتدربين المسجَّلة في النظام.</p>
+        </a>
+
+        <a class="module-card" routerLink="/admin/courses">
+          <div class="stat-line">
+            <span class="stat-num">{{ courses() }}</span>
+            <span class="stat-unit">كورس</span>
+          </div>
+          <h2>الكورسات</h2>
+          <p>الكورسات المتاحة، كلٌّ بمدرّب واحد وسعة محدّدة.</p>
+        </a>
+
+        <a class="module-card" routerLink="/admin/enrollments">
+          <div class="stat-line">
+            <span class="stat-num">{{ enrolled() }}</span>
+            <span class="stat-unit">/ {{ capacity() }} مقعد</span>
+          </div>
+          <h2>التسجيلات</h2>
+          <p>
+            @if (fillRate() !== null) {
+              نسبة الإشغال {{ fillRate() }}% من إجمالي السعة.
+            } @else {
+              لا توجد كورسات لعرض نسبة الإشغال.
+            }
+          </p>
+        </a>
+
       </div>
-      <div class="card">
-        <h2 style="margin-bottom:6px;">إدارة المتدربين</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">إضافة وتعديل وحذف حسابات المتدربين.</p>
-        <a routerLink="/admin/trainees" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
-      <div class="card">
-        <h2 style="margin-bottom:6px;">إدارة الكورسات</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">إنشاء الكورسات وتحديد السعة والمدرّب.</p>
-        <a routerLink="/admin/courses" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
-      <div class="card">
-        <h2 style="margin-bottom:6px;">تسجيل المتدربين</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">تسجيل المتدربين بالكورسات وإدارة القوائم.</p>
-        <a routerLink="/admin/enrollments" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
-    </div>
+    }
   </div>
 </div>

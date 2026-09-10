@@ -26,17 +26,20 @@ public class TraineeExamService {
     private final SubmissionRepository submissionRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final TraineeRepository traineeRepository;
+    private final NotificationService notificationService;
 
     public TraineeExamService(ExamRepository examRepository,
                               QuestionRepository questionRepository,
                               SubmissionRepository submissionRepository,
                               EnrollmentRepository enrollmentRepository,
-                              TraineeRepository traineeRepository) {
+                              TraineeRepository traineeRepository,
+                              NotificationService notificationService) {
         this.examRepository = examRepository;
         this.questionRepository = questionRepository;
         this.submissionRepository = submissionRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.traineeRepository = traineeRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -124,6 +127,14 @@ public class TraineeExamService {
         submission.setScore(score);
         submission.getAnswers().addAll(answers);
         submissionRepository.save(submission);
+
+        notificationService.notifyCourseTrainer(
+                exam.getCourse(),
+                "تسليم اختبار: " + exam.getTitle(),
+                trainee.getUser().getName() + " سلّم الاختبار — العلامة "
+                        + score + " من " + exam.getTotalMarks() + ".",
+                "/trainer/exams",
+                NotificationType.EXAM_SUBMITTED);
 
         return new SubmissionResultResponse(exam.getId(), exam.getTitle(), score,
                 exam.getTotalMarks(), correctCount, questions.size());

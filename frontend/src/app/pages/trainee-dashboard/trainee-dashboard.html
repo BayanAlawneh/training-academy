@@ -66,29 +66,20 @@
     }
 
     <div class="grid">
-      <div class="card">
-        <h2 style="margin-bottom:6px;">كورساتي</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          الكورسات التي سجّلك فيها مدير النظام، مع مدرّب كل كورس.
-        </p>
-        <a routerLink="/trainee/courses" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
+      <a class="module-card" routerLink="/trainee/courses">
+        <h2>كورساتي</h2>
+        <p>الكورسات التي سجّلك فيها مدير النظام، مع مدرّب كل كورس ومدّته.</p>
+      </a>
 
-      <div class="card">
-        <h2 style="margin-bottom:6px;">حضوري</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          سجلّ حضورك وغيابك في جلسات كل كورس، ونسبة حضورك.
-        </p>
-        <a routerLink="/trainee/attendance" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
+      <a class="module-card" routerLink="/trainee/attendance">
+        <h2>حضوري</h2>
+        <p>سجلّ حضورك وغيابك في جلسات كل كورس، ونسبة حضورك.</p>
+      </a>
 
-      <div class="card">
-        <h2 style="margin-bottom:6px;">اختباراتي</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          اختبارات كورساتك، ومواعيدها، وعلاماتك بعد التسليم.
-        </p>
-        <a routerLink="/trainee/exams" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
+      <a class="module-card" routerLink="/trainee/exams">
+        <h2>اختباراتي</h2>
+        <p>اختبارات كورساتك، ومواعيدها، وعلاماتك بعد التسليم.</p>
+      </a>
     </div>
   </div>
 </div>

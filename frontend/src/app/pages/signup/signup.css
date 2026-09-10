@@ -27,9 +27,19 @@
 }
 
 /* شبكة الدفتر فوق التدرّج */
+/* طبقة تعتيم بين التدرّج والنص — تضمن التباين في كل المواضع */
+.auth-art > .art-inner,
+.auth-art > .art-foot { position: relative; z-index: 3; }
+
+.auth-art .scrim {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(105deg, rgba(4,12,16,.55) 0%, rgba(4,12,16,.20) 65%);
+  pointer-events: none;
+}
+
 .auth-art::before {
   content: '';
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; z-index: 2;
   background-image:
     linear-gradient(rgba(231,237,232,.055) 1px, transparent 1px),
     linear-gradient(90deg, rgba(231,237,232,.055) 1px, transparent 1px);
@@ -60,22 +70,28 @@
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-weight: 800; font-size: 15px;
 }
-.art-badge .name { font-size: 15px; font-weight: 700; }
+.art-badge .name { font-size: 15px; font-weight: 700; color: #FFFFFF; }
 
+/* لون صريح لا يرث من الحاوية: العنوان كان يذوب في التدرّج الداكن
+   لأن --on-ink مائل للرمادي. أبيض نقي مع ظل خفيف يرفع التباين. */
 .art-title {
   font-family: var(--font-display);
   font-size: 38px; font-weight: 800; line-height: 1.25;
   margin: 0 0 16px;
+  color: #FFFFFF;
+  text-shadow: 0 2px 12px rgba(0,0,0,.45);
 }
 .art-sub {
   font-size: 15px; line-height: 1.8;
-  color: var(--on-ink-muted); margin: 0 0 34px;
+  color: #D8E2E4; margin: 0 0 34px;
+  text-shadow: 0 1px 8px rgba(0,0,0,.35);
 }
 
 .art-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .art-points li {
   display: flex; align-items: center; gap: 11px;
-  font-size: 14px; color: var(--on-ink);
+  font-size: 14px; color: #EDF3F4;
+  text-shadow: 0 1px 8px rgba(0,0,0,.35);
 }
 .art-points .tick {
   flex: none; width: 24px; height: 24px; border-radius: 50%;

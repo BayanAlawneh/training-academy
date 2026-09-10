@@ -56,21 +56,15 @@
     }
 
     <div class="grid">
-      <div class="card">
-        <h2 style="margin-bottom:6px;">الجلسات والحضور</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          أنشئي جلسات كورسك، ولّدي جدول لقاءات كامل، وسجّلي حضور المتدربين.
-        </p>
-        <a routerLink="/trainer/sessions" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
+      <a class="module-card" routerLink="/trainer/sessions">
+        <h2>الجلسات والحضور</h2>
+        <p>أنشئ جلسات كورسك، ولّد جدول لقاءات كامل، وسجّل حضور المتدربين.</p>
+      </a>
 
-      <div class="card">
-        <h2 style="margin-bottom:6px;">الاختبارات</h2>
-        <p style="color:var(--muted); font-size:13.5px; margin:0 0 14px;">
-          أنشئي اختبارات بنافذة زمنية، وتابعي علامات المتدربين.
-        </p>
-        <a routerLink="/trainer/exams" style="text-decoration:none;"><button class="btn-primary">فتح</button></a>
-      </div>
+      <a class="module-card" routerLink="/trainer/exams">
+        <h2>الاختبارات</h2>
+        <p>أنشئ اختبارات بنافذة زمنية محدّدة، وتابع علامات المتدربين.</p>
+      </a>
     </div>
   </div>
 </div>

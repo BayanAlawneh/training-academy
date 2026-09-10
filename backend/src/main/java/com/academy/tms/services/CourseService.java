@@ -4,6 +4,7 @@ import com.academy.tms.dto.CourseDetailsRequest;
 import com.academy.tms.dto.CourseRequest;
 import com.academy.tms.dto.CourseResponse;
 import com.academy.tms.entities.Course;
+import com.academy.tms.entities.NotificationType;
 import com.academy.tms.entities.Trainer;
 import com.academy.tms.repository.TrainerRepository;
 import com.academy.tms.exception.DuplicateResourceException;
@@ -24,13 +25,16 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final TrainerRepository trainerRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final NotificationService notificationService;
 
     public CourseService(CourseRepository courseRepository,
                          TrainerRepository trainerRepository,
-                         EnrollmentRepository enrollmentRepository) {
+                         EnrollmentRepository enrollmentRepository,
+                         NotificationService notificationService) {
         this.courseRepository = courseRepository;
         this.trainerRepository = trainerRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +66,17 @@ public class CourseService {
         course.setDescription(trimOrNull(request.getDescription()));
         course.setDurationWeeks(request.getDurationWeeks());
 
-        return CourseResponse.from(courseRepository.save(course), 0L);
+        Course saved = courseRepository.save(course);
+
+        notificationService.notifyCourseTrainer(
+                saved,
+                "تمّ إسناد كورس إليك",
+                "أسند إليك مدير النظام كورس " + saved.getTitle()
+                        + " بسعة " + saved.getCapacity() + " متدرّب.",
+                "/trainer",
+                NotificationType.COURSE_ASSIGNED);
+
+        return CourseResponse.from(saved, 0L);
     }
 
     @Transactional
@@ -107,6 +121,14 @@ public class CourseService {
         assertTrainerIsFree(newTrainer, courseId);
 
         course.setTrainer(newTrainer);
+
+        notificationService.notifyCourseTrainer(
+                course,
+                "تمّ إسناد كورس إليك",
+                "نُقل إليك كورس " + course.getTitle() + " ليصبح تحت إشرافك.",
+                "/trainer",
+                NotificationType.COURSE_ASSIGNED);
+
         return CourseResponse.from(course, enrollmentRepository.countByCourseId(courseId));
     }
 

@@ -44,10 +44,16 @@ export class NotificationBell implements OnInit {
 
   icon(type: string): string {
     switch (type) {
+      // للمتدرّب
       case 'EXAM_PUBLISHED':      return '؟';
       case 'SESSION_SCHEDULED':   return '◷';
       case 'ATTENDANCE_RECORDED': return '✓';
       case 'ENROLLED':            return '★';
+      // للمدرّب
+      case 'EXAM_SUBMITTED':      return '✎';
+      case 'TRAINEE_ENROLLED':    return '+';
+      case 'TRAINEE_REMOVED':     return '−';
+      case 'COURSE_ASSIGNED':     return '◆';
       default:                    return '•';
     }
   }

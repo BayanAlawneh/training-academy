@@ -9,6 +9,7 @@ import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.CourseRepository;
 import com.academy.tms.repository.EnrollmentRepository;
+import com.academy.tms.entities.NotificationType;
 import com.academy.tms.repository.TraineeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +23,16 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final TraineeRepository traineeRepository;
+    private final NotificationService notificationService;
 
     public EnrollmentService(EnrollmentRepository enrollmentRepository,
                              CourseRepository courseRepository,
-                             TraineeRepository traineeRepository) {
+                             TraineeRepository traineeRepository,
+                             NotificationService notificationService) {
         this.enrollmentRepository = enrollmentRepository;
         this.courseRepository = courseRepository;
         this.traineeRepository = traineeRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -65,13 +69,40 @@ public class EnrollmentService {
         }
 
         Enrollment enrollment = new Enrollment(trainee, course, LocalDate.now());
-        return EnrollmentResponse.from(enrollmentRepository.save(enrollment));
+        Enrollment saved = enrollmentRepository.save(enrollment);
+
+        notificationService.notifyUser(
+                trainee.getUser(),
+                "تمّ تسجيلك في كورس جديد",
+                "سجّلك مدير النظام في كورس " + course.getTitle()
+                        + " مع المدرّب " + course.getTrainer().getUser().getName() + ".",
+                "/trainee/courses",
+                NotificationType.ENROLLED);
+
+        notificationService.notifyCourseTrainer(
+                course,
+                "متدرّب جديد في كورسك",
+                "تمّ تسجيل " + trainee.getUser().getName() + " في كورس " + course.getTitle() + ".",
+                "/trainer/sessions",
+                NotificationType.TRAINEE_ENROLLED);
+
+        return EnrollmentResponse.from(saved);
     }
 
     @Transactional
     public void remove(Long id) {
         Enrollment enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found: " + id));
+        Course course = enrollment.getCourse();
+        String traineeName = enrollment.getTrainee().getUser().getName();
+
         enrollmentRepository.delete(enrollment);
+
+        notificationService.notifyCourseTrainer(
+                course,
+                "إلغاء تسجيل متدرّب",
+                "تمّ إلغاء تسجيل " + traineeName + " من كورس " + course.getTitle() + ".",
+                "/trainer/sessions",
+                NotificationType.TRAINEE_REMOVED);
     }
 }

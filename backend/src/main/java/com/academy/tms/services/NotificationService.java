@@ -1,6 +1,7 @@
 package com.academy.tms.services;
 
 import com.academy.tms.dto.NotificationResponse;
+import com.academy.tms.entities.Course;
 import com.academy.tms.entities.Notification;
 import com.academy.tms.entities.NotificationType;
 import com.academy.tms.entities.User;
@@ -51,6 +52,21 @@ public class NotificationService {
     @Transactional
     public void notifyUser(User user, String title, String body, String link, NotificationType type) {
         notificationRepository.save(new Notification(user, title, body, link, type));
+    }
+
+    /**
+     * إشعار مدرّب كورس معيّن. يُستدعى عند تسليم امتحان أو تغيّر في تسجيلات كورسه.
+     * مثل الدالة التالية، لا يرمي استثناءً: فشل الإشعار يجب ألا يُلغي العملية الأصلية.
+     */
+    @Transactional
+    public void notifyCourseTrainer(Course course, String title, String body,
+                                    String link, NotificationType type) {
+        try {
+            User trainerUser = course.getTrainer().getUser();
+            notificationRepository.save(new Notification(trainerUser, title, body, link, type));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

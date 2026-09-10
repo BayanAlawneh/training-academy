@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -201,6 +202,7 @@ public class TrainerPortalService {
     public List<AttendanceRowResponse> markAttendance(String email, Long sessionId,
                                                       AttendanceMarkRequest request) {
         TrainingSession session = loadOwnedSession(email, sessionId);
+        assertSessionStarted(session);
 
         for (AttendanceMarkRequest.Entry entry : request.getEntries()) {
             if (entry.getTraineeId() == null || entry.getStatus() == null) continue;
@@ -249,6 +251,24 @@ public class TrainerPortalService {
     }
 
     // ---------- مساعدات ----------
+
+    /**
+     * الحضور يُسجَّل بعد بدء الجلسة فقط.
+     *
+     * الجلسات السابقة تبقى قابلة للتعديل — قد يصحّح المدرّب سجلّاً قديماً.
+     * أما جلسة لم تبدأ بعد فلا يوجد حضور يُسجَّل فيها أصلاً، وتسجيله يعني
+     * بيانات مخترَعة. المقارنة على تاريخ الجلسة ووقت بدايتها معاً، لا على
+     * التاريخ وحده، وإلا سُجّل حضور جلسة مسائية من الصباح.
+     */
+    private void assertSessionStarted(TrainingSession session) {
+        LocalDateTime startsAt = LocalDateTime.of(session.getSessionDate(), session.getStartTime());
+
+        if (LocalDateTime.now().isBefore(startsAt)) {
+            throw new IllegalStateException(
+                    "Attendance cannot be recorded before the session starts. This session begins on "
+                            + session.getSessionDate() + " at " + session.getStartTime() + ".");
+        }
+    }
 
     private void validateTimes(java.time.LocalTime start, java.time.LocalTime end) {
         if (start != null && end != null && !end.isAfter(start)) {

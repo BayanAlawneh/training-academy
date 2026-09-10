@@ -407,8 +407,72 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   بطاقة وحدة: البطاقة كلها هي الرابط، بلا زر داخلي.
+   التحويم يلوّن البطاقة نفسها بدل زر منفصل، فيختفي "خانة الزر" الفارغة.
+   -------------------------------------------------------------------------- */
+a.module-card,
+a.module-card:visited {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.module-card {
+  background: var(--card-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 22px;
+  transition: background .16s ease, border-color .16s ease,
+              box-shadow .16s ease, transform .16s ease;
+}
+
+.module-card:hover {
+  background: var(--brass-soft);
+  border-color: var(--brass);
+  box-shadow: 0 6px 18px rgba(11,26,34,.10);
+  transform: translateY(-2px);
+}
+
+.module-card h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.module-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* بطاقة معطّلة — ميزة لم تُبنَ بعد */
+.module-card.is-disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.module-card .soon-tag {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 2px 7px;
 }
 
 .form-actions { display: flex; gap: 8px; margin-top: 18px; }
@@ -494,3 +558,54 @@ tbody tr:hover td { background: rgba(194,90,71,.04); }
   .dashboard > header::before, .page > header::before { display: none; }
   .dashboard .modules { flex-direction: row; }
 }
+
+
+/* ==========================================================================
+   عنصر معطّل في الشريط الجانبي — نفس محاذاة الروابط بلا سلوك نقر
+   ========================================================================== */
+.dashboard .modules li .soon,
+.page .modules li .soon {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  color: var(--on-ink-muted);
+  font-weight: 700;
+  font-size: 13.5px;
+  opacity: .42;
+  cursor: not-allowed;
+  border-radius: 5px;
+}
+
+.dashboard .modules li .soon .tag,
+.page .modules li .soon .tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   جدول الكورسات: الوصف يُقصّ بسطرين بدل أن يمدّ الصف
+   ========================================================================== */
+.cell-title { font-weight: 700; font-size: 14px; }
+
+.cell-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-top: 3px;
+  max-width: 300px;
+}
+
+td .cell-desc { white-space: normal; }
+
+/* عمود العنوان يأخذ نصيبه، وباقي الأعمدة لا تنضغط */
+table th.col-title, table td.col-title { width: 34%; }
+table th.col-num,   table td.col-num   { width: 1%; white-space: nowrap; }

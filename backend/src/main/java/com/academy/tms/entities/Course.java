@@ -1,4 +1,4 @@
-package com.academy.tms.entities;
+﻿package com.academy.tms.entities;
 
 import jakarta.persistence.*;
 
@@ -24,7 +24,7 @@ public class Course {
     private Integer durationWeeks;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "trainer_id", nullable = false)
+    @JoinColumn(name = "trainer_id", nullable = false, unique = true)
     private Trainer trainer;
 
     protected Course() {

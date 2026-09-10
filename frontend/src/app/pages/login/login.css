@@ -27,13 +27,11 @@
 }
 
 /* شبكة الدفتر فوق التدرّج */
-/* طبقة تعتيم بين التدرّج والنص — تضمن التباين في كل المواضع */
-.auth-art > .art-inner,
-.auth-art > .art-foot { position: relative; z-index: 3; }
-
+/* طبقة تعتيم بين التدرّج والنص، تضمن التباين في كل المواضع.
+   z-index فقط — لا تلمس position أي عنصر، وإلا خرج التذييل من قاع اللوحة. */
 .auth-art .scrim {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(105deg, rgba(4,12,16,.55) 0%, rgba(4,12,16,.20) 65%);
+  background: linear-gradient(105deg, rgba(4,12,16,.58) 0%, rgba(4,12,16,.22) 65%);
   pointer-events: none;
 }
 
@@ -50,7 +48,7 @@
 /* حلقات التغليف على الحافّة — نفس لغة الشريط الجانبي */
 .auth-art::after {
   content: '';
-  position: absolute;
+  position: absolute; z-index: 4;
   left: -8px; top: 40px; bottom: 40px; width: 16px;
   background-image: radial-gradient(circle, var(--paper) 5.5px, transparent 6px);
   background-size: 16px 38px;
@@ -58,7 +56,7 @@
   pointer-events: none;
 }
 
-.art-inner { position: relative; z-index: 2; max-width: 420px; }
+.art-inner { position: relative; z-index: 3; max-width: 420px; }
 
 .art-badge {
   display: inline-flex; align-items: center; gap: 9px;
@@ -72,8 +70,6 @@
 }
 .art-badge .name { font-size: 15px; font-weight: 700; color: #FFFFFF; }
 
-/* لون صريح لا يرث من الحاوية: العنوان كان يذوب في التدرّج الداكن
-   لأن --on-ink مائل للرمادي. أبيض نقي مع ظل خفيف يرفع التباين. */
 .art-title {
   font-family: var(--font-display);
   font-size: 38px; font-weight: 800; line-height: 1.25;
@@ -101,7 +97,7 @@
 }
 
 .art-foot {
-  position: absolute; bottom: 30px; right: 52px; z-index: 2;
+  position: absolute; bottom: 30px; right: 52px; z-index: 3;
   font-family: var(--font-mono); font-size: 11px;
   color: rgba(143,162,168,.65); letter-spacing: .06em;
 }

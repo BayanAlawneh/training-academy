@@ -2,6 +2,7 @@ package com.academy.tms.services;
 
 import com.academy.tms.dto.*;
 import com.academy.tms.entities.*;
+import com.academy.tms.entities.NotificationType;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.*;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,19 +28,22 @@ public class ExamService {
     private final EnrollmentRepository enrollmentRepository;
     private final TrainerRepository trainerRepository;
     private final CourseRepository courseRepository;
+    private final NotificationService notificationService;
 
     public ExamService(ExamRepository examRepository,
                        QuestionRepository questionRepository,
                        SubmissionRepository submissionRepository,
                        EnrollmentRepository enrollmentRepository,
                        TrainerRepository trainerRepository,
-                       CourseRepository courseRepository) {
+                       CourseRepository courseRepository,
+                       NotificationService notificationService) {
         this.examRepository = examRepository;
         this.questionRepository = questionRepository;
         this.submissionRepository = submissionRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.trainerRepository = trainerRepository;
         this.courseRepository = courseRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -129,6 +133,17 @@ public class ExamService {
         }
 
         exam.setPublished(published);
+
+        if (published) {
+            notificationService.notifyCourseTrainees(
+                    exam.getCourse().getId(),
+                    "اختبار جديد: " + exam.getTitle(),
+                    "كورس " + exam.getCourse().getTitle() + " — العلامة الكاملة "
+                            + exam.getTotalMarks() + ". تأكّد من التقديم داخل الوقت المحدّد.",
+                    "/trainee/exams",
+                    NotificationType.EXAM_PUBLISHED);
+        }
+
         return ExamResponse.summary(exam,
                 (int) questionRepository.countByExamId(examId),
                 submissionRepository.findAllByExamIdWithTrainee(examId).size());

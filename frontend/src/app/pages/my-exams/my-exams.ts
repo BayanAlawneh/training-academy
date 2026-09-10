@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationBell } from '../../shared/notification-bell/notification-bell';
 import { AuthService } from '../../core/services/auth.service';
 import { TraineeExamService } from '../../core/services/trainee-exam.service';
 import { EXAM_STATE_LABEL, ExamState, MyExam } from '../../core/models/exam.models';
 
 @Component({
   selector: 'app-my-exams',
-  imports: [RouterLink],
+  imports: [RouterLink, NotificationBell],
   templateUrl: './my-exams.html',
   styleUrl: './my-exams.css'
 })

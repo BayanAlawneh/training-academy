@@ -1,0 +1,46 @@
+<div class="bell-wrap">
+  <button class="bell-btn" (click)="toggle()" [class.on]="open()" aria-label="الإشعارات">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+    </svg>
+    @if (service.unread() > 0) {
+      <span class="dot">{{ service.unread() > 9 ? '9+' : service.unread() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="backdrop" (click)="close()"></div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">الإشعارات</span>
+        <div class="head-actions">
+          @if (service.unread() > 0) {
+            <button class="mark-read" (click)="markAllRead()">تعليم الكل كمقروء</button>
+          }
+          <button class="close-btn" (click)="close()" aria-label="إغلاق">×</button>
+        </div>
+      </div>
+
+      @if (service.loading()) {
+        <p class="panel-empty">جارٍ التحميل…</p>
+      } @else if (service.items().length === 0) {
+        <p class="panel-empty">لا توجد إشعارات.</p>
+      } @else {
+        <ul class="list">
+          @for (item of service.items(); track item.id) {
+            <li class="item" [class.unread]="!item.read" (click)="go(item)">
+              <span class="ic">{{ icon(item.type) }}</span>
+              <div class="txt">
+                <span class="t">{{ item.title }}</span>
+                @if (item.body) { <span class="b">{{ item.body }}</span> }
+                <span class="ago">{{ ago(item.createdAt) }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

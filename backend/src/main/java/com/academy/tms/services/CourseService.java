@@ -1,14 +1,16 @@
 package com.academy.tms.services;
 
+import com.academy.tms.dto.CourseDetailsRequest;
 import com.academy.tms.dto.CourseRequest;
 import com.academy.tms.dto.CourseResponse;
 import com.academy.tms.entities.Course;
 import com.academy.tms.entities.Trainer;
+import com.academy.tms.repository.TrainerRepository;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.CourseRepository;
 import com.academy.tms.repository.EnrollmentRepository;
-import com.academy.tms.repository.TrainerRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +59,8 @@ public class CourseService {
         assertTrainerIsFree(trainer, null);
 
         Course course = new Course(request.getTitle(), request.getCapacity(), trainer);
+        course.setDescription(trimOrNull(request.getDescription()));
+        course.setDurationWeeks(request.getDurationWeeks());
 
         return CourseResponse.from(courseRepository.save(course), 0L);
     }
@@ -85,6 +89,8 @@ public class CourseService {
         course.setTitle(request.getTitle());
         course.setCapacity(request.getCapacity());
         course.setTrainer(newTrainer);
+        course.setDescription(trimOrNull(request.getDescription()));
+        course.setDurationWeeks(request.getDurationWeeks());
 
         return CourseResponse.from(course, enrolled);
     }
@@ -115,6 +121,34 @@ public class CourseService {
         }
 
         courseRepository.delete(course);
+    }
+
+    /**
+     * الوصف والمدّة: يعدّلهما الأدمن عبر update، أو المدرّب المستلم للكورس
+     * عبر هذه الدالة. مدرّب آخر يُرفض حتى لو مرّر معرّف الكورس صراحة —
+     * دور TRAINER يمنع المتدربين لا الزملاء.
+     */
+    @Transactional
+    public CourseResponse updateDetails(String trainerEmail, Long courseId,
+                                        CourseDetailsRequest request) {
+        Course course = loadCourse(courseId);
+
+        Trainer trainer = trainerRepository.findByUserEmail(trainerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No trainer profile is linked to this account"));
+
+        if (!course.getTrainer().getId().equals(trainer.getId())) {
+            throw new AccessDeniedException("This course is not assigned to you");
+        }
+
+        course.setDescription(trimOrNull(request.getDescription()));
+        course.setDurationWeeks(request.getDurationWeeks());
+
+        return CourseResponse.from(course, enrollmentRepository.countByCourseId(courseId));
+    }
+
+    private String trimOrNull(String value) {
+        return (value == null || value.isBlank()) ? null : value.trim();
     }
 
     /**

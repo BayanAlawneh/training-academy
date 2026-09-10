@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationBell } from '../../shared/notification-bell/notification-bell';
 import { AuthService } from '../../core/services/auth.service';
 import { PortalService } from '../../core/services/portal.service';
 import { MyCourse } from '../../core/models/portal.models';
 
 @Component({
   selector: 'app-my-courses',
-  imports: [RouterLink],
+  imports: [RouterLink, NotificationBell],
   templateUrl: './my-courses.html',
   styleUrl: './my-courses.css'
 })

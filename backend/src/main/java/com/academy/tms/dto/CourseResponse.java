@@ -11,9 +11,12 @@ public class CourseResponse {
     private String trainerName;
     private long enrolledCount;
     private boolean full;
+    private String description;
+    private Integer durationWeeks;
 
     public CourseResponse(Long id, String title, Integer capacity, Long trainerId,
-                          String trainerName, long enrolledCount) {
+                          String trainerName, long enrolledCount,
+                          String description, Integer durationWeeks) {
         this.id = id;
         this.title = title;
         this.capacity = capacity;
@@ -21,6 +24,8 @@ public class CourseResponse {
         this.trainerName = trainerName;
         this.enrolledCount = enrolledCount;
         this.full = enrolledCount >= capacity;
+        this.description = description;
+        this.durationWeeks = durationWeeks;
     }
 
     public static CourseResponse from(Course course, long enrolledCount) {
@@ -30,35 +35,19 @@ public class CourseResponse {
                 course.getCapacity(),
                 course.getTrainer().getId(),
                 course.getTrainer().getUser().getName(),
-                enrolledCount
+                enrolledCount,
+                course.getDescription(),
+                course.getDurationWeeks()
         );
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public Long getTrainerId() {
-        return trainerId;
-    }
-
-    public String getTrainerName() {
-        return trainerName;
-    }
-
-    public long getEnrolledCount() {
-        return enrolledCount;
-    }
-
-    public boolean isFull() {
-        return full;
-    }
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public Integer getCapacity() { return capacity; }
+    public Long getTrainerId() { return trainerId; }
+    public String getTrainerName() { return trainerName; }
+    public long getEnrolledCount() { return enrolledCount; }
+    public boolean isFull() { return full; }
+    public String getDescription() { return description; }
+    public Integer getDurationWeeks() { return durationWeeks; }
 }

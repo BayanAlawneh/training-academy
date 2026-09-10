@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationBell } from '../../shared/notification-bell/notification-bell';
 import { AuthService } from '../../core/services/auth.service';
 import { TrainerPortalService } from '../../core/services/trainer-portal.service';
 import { TrainerSummary } from '../../core/models/portal.models';
 
 @Component({
   selector: 'app-trainer-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, NotificationBell],
   templateUrl: './trainer-dashboard.html',
   styleUrl: './trainer-dashboard.css'
 })

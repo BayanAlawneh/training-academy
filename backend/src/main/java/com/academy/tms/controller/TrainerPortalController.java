@@ -1,6 +1,7 @@
 package com.academy.tms.controller;
 
 import com.academy.tms.dto.*;
+import com.academy.tms.services.CourseService;
 import com.academy.tms.services.TrainerPortalService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,21 @@ import java.util.List;
 public class TrainerPortalController {
 
     private final TrainerPortalService portalService;
+    private final CourseService courseService;
 
-    public TrainerPortalController(TrainerPortalService portalService) {
+    public TrainerPortalController(TrainerPortalService portalService,
+                                   CourseService courseService) {
         this.portalService = portalService;
+        this.courseService = courseService;
+    }
+
+    /** المدرّب يكتب وصف كورسه ومدّته — لا يملك تعديل السعة ولا المدرّب. */
+    @PutMapping("/me/course/details")
+    public ResponseEntity<ApiResponse<CourseResponse>> updateCourseDetails(
+            Authentication auth, @RequestParam Long courseId,
+            @Valid @RequestBody CourseDetailsRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok("Course details updated",
+                courseService.updateDetails(auth.getName(), courseId, request)));
     }
 
     @GetMapping("/me/summary")

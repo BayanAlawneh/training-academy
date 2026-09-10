@@ -33,6 +33,7 @@
     </ul>
 
     <div style="margin-top:auto; display:flex; align-items:center; gap:9px; padding-top:16px; border-top:1px solid rgba(231,237,232,.14);">
+      <app-notification-bell></app-notification-bell>
       <div class="role">{{ auth.role()?.charAt(0) }}</div>
       <span style="color:var(--on-ink); font-size:12.5px; font-weight:600;">{{ auth.user()?.name }}</span>
     </div>
@@ -84,7 +85,7 @@
               <th>#</th>
               <th>الكورس</th>
               <th>المدرّب</th>
-              <th>السعة</th>
+              <th>المدّة</th>
               <th>تاريخ التسجيل</th>
             </tr>
           </thead>
@@ -92,14 +93,21 @@
             @for (course of courses(); track course.enrollmentId; let i = $index) {
               <tr>
                 <td>{{ i + 1 }}</td>
-                <td class="course-title">{{ course.title }}</td>
+                <td>
+                  <span class="course-title">{{ course.title }}</span>
+                  @if (course.description) {
+                    <span class="course-desc">{{ course.description }}</span>
+                  }
+                </td>
                 <td class="trainer-cell">
                   <span class="name">{{ course.trainerName }}</span>
                   @if (course.trainerSpecialization) {
                     <span class="spec">{{ course.trainerSpecialization }}</span>
                   }
                 </td>
-                <td>{{ course.capacity }}</td>
+                <td class="date-cell">
+                  {{ course.durationWeeks ? course.durationWeeks + ' أسبوع' : '—' }}
+                </td>
                 <td class="date-cell">{{ formatDate(course.enrolledOn) }}</td>
               </tr>
             }

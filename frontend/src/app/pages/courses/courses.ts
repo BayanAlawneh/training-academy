@@ -34,6 +34,8 @@ export class Courses implements OnInit {
     title: ["", [Validators.required]],
     capacity: [1, [Validators.required, Validators.min(1)]],
     trainerId: [0, [Validators.required, Validators.min(1)]],
+    description: [""],
+    durationWeeks: [0],
   });
 
   ngOnInit(): void {
@@ -65,7 +67,7 @@ export class Courses implements OnInit {
   openCreate(): void {
     this.editingId.set(null);
     this.errorMessage.set(null);
-    this.form.setValue({ title: "", capacity: 1, trainerId: 0 });
+    this.form.setValue({ title: "", capacity: 1, trainerId: 0, description: "", durationWeeks: 0 });
     this.formOpen.set(true);
   }
 
@@ -76,6 +78,8 @@ export class Courses implements OnInit {
       title: course.title,
       capacity: course.capacity,
       trainerId: course.trainerId,
+      description: course.description ?? "",
+      durationWeeks: course.durationWeeks ?? 0,
     });
     this.formOpen.set(true);
   }
@@ -101,6 +105,9 @@ export class Courses implements OnInit {
       title: value.title,
       capacity: Number(value.capacity),
       trainerId: Number(value.trainerId),
+      description: value.description?.trim() ? value.description.trim() : null,
+      // 0 يعني "غير محدّدة" — نرسل null لا صفراً حتى لا يفشل التحقّق @Min(1)
+      durationWeeks: Number(value.durationWeeks) > 0 ? Number(value.durationWeeks) : null,
     };
 
     const request =

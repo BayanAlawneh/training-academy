@@ -1,41 +1,65 @@
-<div class="login-page">
-  <div class="login-card">
+<div class="auth-page">
 
-    <h1>تسجيل الدخول</h1>
-    <p class="subtitle">أكاديمية التدريب</p>
-
-    @if (errorMessage()) {
-      <div class="alert">{{ errorMessage() }}</div>
-    }
-
-    <form [formGroup]="form" (ngSubmit)="submit()">
-
-      <div class="field">
-        <label for="email">البريد الإلكتروني</label>
-        <input id="email" type="email" formControlName="email" placeholder="you@example.com">
-        @if (form.controls.email.invalid && form.controls.email.touched) {
-          <span class="error">أدخل بريداً إلكترونياً صحيحاً</span>
-        }
+  <aside class="auth-art">
+    <div class="art-inner">
+      <div class="art-badge">
+        <span class="mark">TA</span>
+        <span class="name">أكاديمية التدريب</span>
       </div>
 
-      <div class="field">
-        <label for="password">كلمة السر</label>
-        <input id="password" type="password" formControlName="password">
-        @if (form.controls.password.invalid && form.controls.password.touched) {
-          <span class="error">كلمة السر مطلوبة</span>
-        }
-      </div>
+      <h2 class="art-title">دفترك التدريبي،<br>في مكان واحد.</h2>
+      <p class="art-sub">
+        كورساتك، جلساتك، حضورك، واختباراتك — منظّمة كما لو كانت صفحات دفتر واحد.
+      </p>
 
-     <button type="submit" [disabled]="loading() || form.invalid">
-        {{ loading() ? 'جارٍ التحقق...' : 'دخول' }}
-      </button>
+      <ul class="art-points">
+        <li><span class="tick">✓</span> جدول لقاءات ومتابعة حضور</li>
+        <li><span class="tick">✓</span> اختبارات بمواعيد محدّدة وتصحيح فوري</li>
+        <li><span class="tick">✓</span> إشعارات فورية بكل جديد</li>
+      </ul>
+    </div>
+    <span class="art-foot">TRAINING MANAGEMENT SYSTEM</span>
+  </aside>
 
-   </form>
+  <main class="auth-form-side">
+    <div class="auth-card">
 
-    <p class="switch">
-      ليس لديك حساب؟
-      <a routerLink="/signup">إنشاء حساب</a>
-    </p>
+      <h1>تسجيل الدخول</h1>
+      <p class="subtitle">أدخل بياناتك للمتابعة</p>
 
-  </div>
+      @if (errorMessage()) {
+        <div class="alert">{{ errorMessage() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <div class="field">
+          <label for="email">البريد الإلكتروني</label>
+          <input id="email" type="email" formControlName="email" placeholder="you@example.com">
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <span class="error">أدخل بريداً إلكترونياً صحيحاً</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="password">كلمة السر</label>
+          <input id="password" type="password" formControlName="password">
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <span class="error">كلمة السر مطلوبة</span>
+          }
+        </div>
+
+        <button type="submit" [disabled]="loading() || form.invalid">
+          {{ loading() ? 'جارٍ التحقق...' : 'دخول' }}
+        </button>
+
+      </form>
+
+      <p class="switch">
+        ليس لديك حساب؟
+        <a routerLink="/signup">إنشاء حساب</a>
+      </p>
+
+    </div>
+  </main>
 </div>

@@ -9,6 +9,7 @@ import com.academy.tms.entities.User;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.AttendanceRepository;
+import com.academy.tms.repository.NotificationRepository;
 import com.academy.tms.repository.SubmissionRepository;
 import com.academy.tms.repository.EnrollmentRepository;
 import com.academy.tms.repository.RoleRepository;
@@ -31,6 +32,7 @@ public class TraineeService {
     private final EnrollmentRepository enrollmentRepository;
     private final AttendanceRepository attendanceRepository;
     private final SubmissionRepository submissionRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public TraineeService(TraineeRepository traineeRepository,
@@ -39,6 +41,7 @@ public class TraineeService {
                           EnrollmentRepository enrollmentRepository,
                           AttendanceRepository attendanceRepository,
                           SubmissionRepository submissionRepository,
+                          NotificationRepository notificationRepository,
                           PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
@@ -46,6 +49,7 @@ public class TraineeService {
         this.enrollmentRepository = enrollmentRepository;
         this.attendanceRepository = attendanceRepository;
         this.submissionRepository = submissionRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -137,7 +141,7 @@ public class TraineeService {
 
     /**
      * الحذف بالترتيب الصحيح للمفاتيح الأجنبية:
-     *   الإجابات ← التسليمات ← الحضور ← التسجيلات ← الملف ← الحساب
+     *   الإجابات ← التسليمات ← الحضور ← التسجيلات ← الملف ← الإشعارات ← الحساب
      *
      * سابقاً كانت التسجيلات تُترك، فيرفض PostgreSQL حذف المتدرّب
      * ويُرمى DataIntegrityViolationException بلا معالجة، فيتحوّل الردّ
@@ -167,6 +171,10 @@ public class TraineeService {
 
         traineeRepository.delete(trainee);
         traineeRepository.flush();
+
+        // الإشعارات تشير إلى المستخدم مباشرة، فتُحذف قبله.
+        notificationRepository.deleteAllByUserId(user.getId());
+        notificationRepository.flush();
 
         userRepository.delete(user);
         userRepository.flush();

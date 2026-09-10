@@ -7,6 +7,8 @@ export interface MyCourse {
   trainerEmail: string;
   trainerSpecialization: string | null;
   enrolledOn: string;
+  description: string | null;
+  durationWeeks: number | null;
 }
 
 export interface MySummary {

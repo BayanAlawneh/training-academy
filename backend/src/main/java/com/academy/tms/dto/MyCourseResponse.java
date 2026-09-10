@@ -4,11 +4,7 @@ import com.academy.tms.entities.Enrollment;
 
 import java.time.LocalDate;
 
-/**
- * الكورس كما يراه المتدرّب: بيانات الكورس + مدرّبه + تاريخ تسجيله هو فيه.
- * مختلف عن CourseResponse لأن المتدرّب لا يحتاج trainerId ولا حالة الامتلاء،
- * بل يحتاج "متى سجّلني الأدمن" و"مين مدرّبي".
- */
+/** الكورس كما يراه المتدرّب: بياناته + مدرّبه + تاريخ تسجيله هو فيه. */
 public class MyCourseResponse {
 
     private Long enrollmentId;
@@ -19,10 +15,13 @@ public class MyCourseResponse {
     private String trainerEmail;
     private String trainerSpecialization;
     private LocalDate enrolledOn;
+    private String description;
+    private Integer durationWeeks;
 
     public MyCourseResponse(Long enrollmentId, Long courseId, String title, Integer capacity,
                             String trainerName, String trainerEmail,
-                            String trainerSpecialization, LocalDate enrolledOn) {
+                            String trainerSpecialization, LocalDate enrolledOn,
+                            String description, Integer durationWeeks) {
         this.enrollmentId = enrollmentId;
         this.courseId = courseId;
         this.title = title;
@@ -31,6 +30,8 @@ public class MyCourseResponse {
         this.trainerEmail = trainerEmail;
         this.trainerSpecialization = trainerSpecialization;
         this.enrolledOn = enrolledOn;
+        this.description = description;
+        this.durationWeeks = durationWeeks;
     }
 
     public static MyCourseResponse from(Enrollment enrollment) {
@@ -45,7 +46,9 @@ public class MyCourseResponse {
                 trainerUser.getName(),
                 trainerUser.getEmail(),
                 course.getTrainer().getSpecialization(),
-                enrollment.getEnrolledOn()
+                enrollment.getEnrolledOn(),
+                course.getDescription(),
+                course.getDurationWeeks()
         );
     }
 
@@ -57,4 +60,6 @@ public class MyCourseResponse {
     public String getTrainerEmail() { return trainerEmail; }
     public String getTrainerSpecialization() { return trainerSpecialization; }
     public LocalDate getEnrolledOn() { return enrolledOn; }
+    public String getDescription() { return description; }
+    public Integer getDurationWeeks() { return durationWeeks; }
 }

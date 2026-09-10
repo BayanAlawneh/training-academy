@@ -16,6 +16,13 @@ public class Course {
     @Column(nullable = false)
     private Integer capacity;
 
+    /** يكتبه الأدمن أو المدرّب المستلم للكورس فقط. */
+    @Column(name = "description", length = 1500)
+    private String description;
+
+    @Column(name = "duration_weeks")
+    private Integer durationWeeks;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "trainer_id", nullable = false)
     private Trainer trainer;
@@ -59,5 +66,21 @@ public class Course {
 
     public void setTrainer(Trainer trainer) {
         this.trainer = trainer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getDurationWeeks() {
+        return durationWeeks;
+    }
+
+    public void setDurationWeeks(Integer durationWeeks) {
+        this.durationWeeks = durationWeeks;
     }
 }

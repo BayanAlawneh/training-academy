@@ -31,19 +31,22 @@ public class TrainerPortalService {
     private final AttendanceRepository attendanceRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final TraineeRepository traineeRepository;
+    private final NotificationService notificationService;
 
     public TrainerPortalService(TrainerRepository trainerRepository,
                                 CourseRepository courseRepository,
                                 SessionRepository sessionRepository,
                                 AttendanceRepository attendanceRepository,
                                 EnrollmentRepository enrollmentRepository,
-                                TraineeRepository traineeRepository) {
+                                TraineeRepository traineeRepository,
+                                NotificationService notificationService) {
         this.trainerRepository = trainerRepository;
         this.courseRepository = courseRepository;
         this.sessionRepository = sessionRepository;
         this.attendanceRepository = attendanceRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.traineeRepository = traineeRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -130,7 +133,17 @@ public class TrainerPortalService {
                     "No sessions fall in this range. Check the weekdays and duration.");
         }
 
-        return sessionRepository.saveAll(created).stream()
+        List<TrainingSession> saved = sessionRepository.saveAll(created);
+
+        notificationService.notifyCourseTrainees(
+                course.getId(),
+                "جدول لقاءات جديد",
+                "تمّت جدولة " + saved.size() + " لقاء في كورس " + course.getTitle()
+                        + ". راجع صفحة حضوري للمواعيد.",
+                "/trainee/attendance",
+                NotificationType.SESSION_SCHEDULED);
+
+        return saved.stream()
                 .map(SessionResponse::from)
                 .toList();
     }
@@ -224,6 +237,13 @@ public class TrainerPortalService {
 
         session.setStatus(SessionStatus.DONE);
         attendanceRepository.flush();
+
+        notificationService.notifyCourseTrainees(
+                session.getCourse().getId(),
+                "تمّ تسجيل الحضور",
+                "سُجّل حضور جلسة \"" + session.getTitle() + "\". راجع صفحة حضوري.",
+                "/trainee/attendance",
+                NotificationType.ATTENDANCE_RECORDED);
 
         return sessionRoster(email, sessionId);
     }

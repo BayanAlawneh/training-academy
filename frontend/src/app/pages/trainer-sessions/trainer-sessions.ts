@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationBell } from '../../shared/notification-bell/notification-bell';
 import { AuthService } from '../../core/services/auth.service';
 import { TrainerPortalService } from '../../core/services/trainer-portal.service';
 import { ModalService } from '../../core/services/modal.service';
@@ -11,7 +12,7 @@ import {
 
 @Component({
   selector: 'app-trainer-sessions',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NotificationBell],
   templateUrl: './trainer-sessions.html',
   styleUrl: './trainer-sessions.css'
 })

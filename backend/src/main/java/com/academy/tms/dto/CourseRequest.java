@@ -18,6 +18,12 @@ public class CourseRequest {
     @NotNull(message = "A trainer must be assigned")
     private Long trainerId;
 
+    @Size(max = 1500, message = "Description is too long")
+    private String description;
+
+    @Min(value = 1, message = "Duration must be at least 1 week")
+    private Integer durationWeeks;
+
     public String getTitle() {
         return title;
     }
@@ -40,5 +46,21 @@ public class CourseRequest {
 
     public void setTrainerId(Long trainerId) {
         this.trainerId = trainerId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getDurationWeeks() {
+        return durationWeeks;
+    }
+
+    public void setDurationWeeks(Integer durationWeeks) {
+        this.durationWeeks = durationWeeks;
     }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationBell } from '../../shared/notification-bell/notification-bell';
 import { AuthService } from '../../core/services/auth.service';
 import { ExamService } from '../../core/services/exam.service';
 import { ModalService } from '../../core/services/modal.service';
@@ -8,7 +9,7 @@ import { Exam, GRADE_STATE_LABEL, GradeRow, GradeState } from '../../core/models
 
 @Component({
   selector: 'app-trainer-exams',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NotificationBell],
   templateUrl: './trainer-exams.html',
   styleUrl: './trainer-exams.css'
 })

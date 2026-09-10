@@ -1,99 +1,157 @@
-.login-page {
+/* ==========================================================================
+   شاشة المصادقة — لوحان: بطاقة النموذج، ولوحة مزخرفة بخلفية.
+   الخلفية مرسومة بـ CSS وSVG مضمّن لا بصورة خارجية: لا تحميل، لا مشكلة
+   ترخيص، ولا رابط ينكسر عند النشر — وتتبع نفس متغيّرات ألوان النظام.
+   ========================================================================== */
+
+.auth-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f3ef;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   direction: rtl;
 }
 
-.login-card {
-  background: #fff;
-  border: 1px solid #d5dcd8;
-  border-radius: 6px;
-  padding: 32px;
-  width: 100%;
-  max-width: 380px;
-  font-family: system-ui, sans-serif;
-}
-
-h1 {
-  margin: 0 0 4px;
-  font-size: 24px;
-  color: #14232b;
-}
-
-.subtitle {
-  margin: 0 0 24px;
-  color: #5e7280;
-  font-size: 14px;
-}
-
-.field {
-  margin-bottom: 18px;
+/* ---------- اللوح المزخرف ---------- */
+.auth-art {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(194,90,71,.30), transparent 55%),
+    radial-gradient(circle at 78% 82%, rgba(23,73,58,.34), transparent 58%),
+    linear-gradient(155deg, #0B1A22 0%, #14262F 58%, #17493A 130%);
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 56px 52px;
+  color: var(--on-ink);
 }
 
-label {
-  font-size: 13px;
-  color: #5e7280;
-  margin-bottom: 6px;
+/* شبكة الدفتر فوق التدرّج */
+.auth-art::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(231,237,232,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(231,237,232,.055) 1px, transparent 1px);
+  background-size: 34px 34px;
+  pointer-events: none;
 }
 
-input {
+/* حلقات التغليف على الحافّة — نفس لغة الشريط الجانبي */
+.auth-art::after {
+  content: '';
+  position: absolute;
+  left: -8px; top: 40px; bottom: 40px; width: 16px;
+  background-image: radial-gradient(circle, var(--paper) 5.5px, transparent 6px);
+  background-size: 16px 38px;
+  background-repeat: repeat-y;
+  pointer-events: none;
+}
+
+.art-inner { position: relative; z-index: 2; max-width: 420px; }
+
+.art-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  margin-bottom: 30px;
+}
+.art-badge .mark {
+  width: 40px; height: 40px; border-radius: 9px;
+  background: var(--brass); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 15px;
+}
+.art-badge .name { font-size: 15px; font-weight: 700; }
+
+.art-title {
+  font-family: var(--font-display);
+  font-size: 38px; font-weight: 800; line-height: 1.25;
+  margin: 0 0 16px;
+}
+.art-sub {
+  font-size: 15px; line-height: 1.8;
+  color: var(--on-ink-muted); margin: 0 0 34px;
+}
+
+.art-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.art-points li {
+  display: flex; align-items: center; gap: 11px;
+  font-size: 14px; color: var(--on-ink);
+}
+.art-points .tick {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid var(--brass); color: var(--brass);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-family: var(--font-mono);
+}
+
+.art-foot {
+  position: absolute; bottom: 30px; right: 52px; z-index: 2;
+  font-family: var(--font-mono); font-size: 11px;
+  color: rgba(143,162,168,.65); letter-spacing: .06em;
+}
+
+/* ---------- لوح النموذج ---------- */
+.auth-form-side {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 32px;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+.auth-card {
+  width: 100%; max-width: 384px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 34px 30px;
+}
+
+.auth-card h1 {
+  font-family: var(--font-display);
+  font-size: 27px; font-weight: 800;
+  margin: 0 0 4px; color: var(--text);
+}
+.auth-card .subtitle {
+  margin: 0 0 26px; color: var(--muted); font-size: 13.5px;
+}
+
+.auth-card .field { margin-bottom: 16px; display: flex; flex-direction: column; gap: 5px; }
+.auth-card label {
+  font-size: 11.5px; font-family: var(--font-mono);
+  color: var(--muted); letter-spacing: .05em;
+}
+.auth-card input {
   padding: 10px 12px;
-  border: 1px solid #c3d0cb;
-  border-radius: 4px;
-  font-size: 15px;
-  font-family: inherit;
+  border: 1px solid var(--rule-soft); border-radius: var(--radius);
+  font-family: inherit; font-size: 14.5px;
+  background: #fff; color: var(--text);
+}
+.auth-card input:focus { outline: none; border-color: var(--brass); }
+
+.auth-card .error {
+  font-size: 11.5px; color: var(--rust); font-family: var(--font-mono);
 }
 
-input:focus {
-  outline: none;
-  border-color: #14232b;
+.auth-card button[type="submit"] {
+  width: 100%; margin-top: 8px;
+  padding: 12px; border: none; border-radius: var(--radius);
+  background: var(--brass); color: #fff;
+  font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.auth-card button[type="submit"]:hover:not(:disabled) { background: var(--brass-dark); }
+.auth-card button[type="submit"]:disabled { opacity: .5; cursor: not-allowed; }
+
+.auth-card .switch {
+  margin: 20px 0 0; text-align: center;
+  font-size: 13px; color: var(--muted);
 }
 
-button {
-  width: 100%;
-  padding: 11px;
-  background: #14232b;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 15px;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.alert {
-  background: #f6e3e0;
-  border: 1px solid #b23a2e;
-  color: #b23a2e;
-  padding: 10px 12px;
-  border-radius: 4px;
-  margin-bottom: 18px;
-  font-size: 14px;
-}
-
-.error {
-  color: #b23a2e;
-  font-size: 12px;
-  margin-top: 5px;
-}
-.switch {
-  margin: 20px 0 0;
-  text-align: center;
-  font-size: 14px;
-  color: #5e7280;
-}
-
-.switch a {
-  color: #14232b;
-  font-weight: 600;
+/* ---------- الشاشات الضيّقة ---------- */
+@media (max-width: 900px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-art { display: none; }
 }

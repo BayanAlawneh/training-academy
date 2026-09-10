@@ -12,6 +12,7 @@ import com.academy.tms.entities.User;
 import com.academy.tms.exception.DuplicateResourceException;
 import com.academy.tms.exception.ResourceNotFoundException;
 import com.academy.tms.repository.CourseRepository;
+import com.academy.tms.repository.NotificationRepository;
 import com.academy.tms.repository.RoleRepository;
 import com.academy.tms.repository.TrainerRepository;
 import com.academy.tms.repository.UserRepository;
@@ -31,17 +32,20 @@ public class TrainerService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CourseRepository courseRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public TrainerService(TrainerRepository trainerRepository,
                           UserRepository userRepository,
                           RoleRepository roleRepository,
                           CourseRepository courseRepository,
+                          NotificationRepository notificationRepository,
                           PasswordEncoder passwordEncoder) {
         this.trainerRepository = trainerRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.courseRepository = courseRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -159,6 +163,9 @@ public class TrainerService {
 
         trainerRepository.delete(trainer);
         trainerRepository.flush();
+
+        notificationRepository.deleteAllByUserId(user.getId());
+        notificationRepository.flush();
 
         userRepository.delete(user);
         userRepository.flush();

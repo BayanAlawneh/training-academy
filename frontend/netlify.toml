@@ -1,0 +1,16 @@
+# إعدادات بناء Netlify لتطبيق Angular
+
+[build]
+  base    = "frontend"
+  command = "npm ci && npm run build -- --configuration production"
+  publish = "dist/frontend/browser"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Angular تطبيق صفحة واحدة: أي مسار غير موجود كملف يجب أن يعود إلى index.html
+# وإلا أعطى تحديث الصفحة على /trainee/exams خطأ 404 من Netlify.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

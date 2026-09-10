@@ -21,6 +21,10 @@ public class QuestionOption {
     @Column(name = "correct", nullable = false)
     private boolean correct;
 
+    /** الطرف الأيمن في سؤال المطابقة. null في MCQ. */
+    @Column(name = "match_text", length = 500)
+    private String matchText;
+
     @Column(name = "position", nullable = false)
     private Integer position;
 
@@ -34,6 +38,14 @@ public class QuestionOption {
         this.position = position;
     }
 
+    public QuestionOption(Question question, String text, String matchText, Integer position) {
+        this.question = question;
+        this.text = text;
+        this.matchText = matchText;
+        this.correct = false;
+        this.position = position;
+    }
+
     public Long getId() { return id; }
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }
@@ -43,4 +55,7 @@ public class QuestionOption {
     public void setCorrect(boolean correct) { this.correct = correct; }
     public Integer getPosition() { return position; }
     public void setPosition(Integer position) { this.position = position; }
+
+    public String getMatchText() { return matchText; }
+    public void setMatchText(String matchText) { this.matchText = matchText; }
 }

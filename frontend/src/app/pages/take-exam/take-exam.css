@@ -69,3 +69,153 @@
   font-family: var(--font-mono); font-size: 13px; color: var(--muted);
   margin: 10px 0 22px;
 }
+
+
+/* ==========================================================================
+   سؤال المطابقة — سحب وإفلات
+   ========================================================================== */
+
+.match-hint {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  line-height: 1.6;
+}
+
+.match-progress {
+  display: inline-block;
+  margin-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--brass);
+  border: 1px solid var(--brass-soft);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .match-grid { grid-template-columns: 1fr; }
+}
+
+.match-col { display: flex; flex-direction: column; gap: 9px; }
+
+/* ---- الخانة الثابتة: العنصر ومكان مقابله ---- */
+.match-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--rule-soft);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .14s, background .14s;
+}
+
+.match-slot .slot-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.match-slot .slot-value { flex: none; min-width: 130px; text-align: left; }
+
+.slot-empty {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted-2);
+}
+
+/* موصولة — الحدّ يصير متّصلاً لا متقطّعاً */
+.match-slot.filled {
+  border-style: solid;
+  border-color: var(--forest);
+  background: rgba(23,73,58,.04);
+}
+
+/* جاهزة لاستقبال الإفلات */
+.match-slot.can-drop {
+  border-color: var(--brass);
+  background: rgba(194,90,71,.06);
+}
+
+.chip-set {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--forest);
+  color: #fff;
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.chip-x {
+  border: none;
+  background: rgba(255,255,255,.22);
+  color: #fff;
+  width: 17px;
+  height: 17px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  flex: none;
+}
+.chip-x:hover { background: rgba(255,255,255,.4); }
+
+/* ---- بنك الأطراف القابلة للسحب ---- */
+.match-bank {
+  background: var(--card-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-height: 90px;
+}
+
+.match-chip {
+  padding: 11px 13px;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: grab;
+  font-size: 13.5px;
+  color: var(--text);
+  transition: border-color .14s, box-shadow .14s, transform .14s;
+  user-select: none;
+}
+
+.match-chip:hover {
+  border-color: var(--brass);
+  box-shadow: 0 2px 8px rgba(11,26,34,.08);
+}
+
+/* المسحوب حالياً */
+.match-chip.held {
+  border-color: var(--brass);
+  border-width: 2px;
+  background: rgba(194,90,71,.08);
+  transform: scale(.97);
+  cursor: grabbing;
+}
+
+.match-chip:active { cursor: grabbing; }
+
+.bank-done {
+  margin: 0;
+  padding: 8px 4px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--forest);
+  text-align: center;
+}

@@ -70,9 +70,15 @@ public class ExamRequest {
 
         private boolean correct;
 
+        /** الطرف الأيمن في سؤال المطابقة. يُتجاهل في MCQ. */
+        @Size(max = 500, message = "Match text is too long")
+        private String matchText;
+
         public String getText() { return text; }
         public void setText(String text) { this.text = text; }
         public boolean isCorrect() { return correct; }
         public void setCorrect(boolean correct) { this.correct = correct; }
+        public String getMatchText() { return matchText; }
+        public void setMatchText(String matchText) { this.matchText = matchText; }
     }
 }

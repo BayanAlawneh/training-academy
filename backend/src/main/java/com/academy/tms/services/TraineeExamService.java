@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * جانب المتدرّب: عرض اختباراته، فتح الورقة، والتسليم مع تصحيح فوري.
@@ -72,7 +74,7 @@ public class TraineeExamService {
 
         List<QuestionResponse> questions = questionRepository
                 .findAllByExamIdWithOptions(examId).stream()
-                .map(QuestionResponse::forTrainee)
+                .map(q -> QuestionResponse.forTrainee(q, trainee.getId()))
                 .toList();
 
         return new ExamPaperResponse(exam.getId(), exam.getTitle(), exam.getDescription(),
@@ -102,19 +104,33 @@ public class TraineeExamService {
         List<Answer> answers = new ArrayList<>();
 
         for (Question question : questions) {
-            Long chosenId = request.getAnswers() == null ? null :
+
+            SubmitExamRequest.AnswerEntry entry = request.getAnswers() == null ? null :
                     request.getAnswers().stream()
                             .filter(a -> question.getId().equals(a.getQuestionId()))
-                            .map(SubmitExamRequest.AnswerEntry::getSelectedOptionId)
                             .findFirst().orElse(null);
+
+            if (question.getType() == QuestionType.MATCHING) {
+                Answer answer = new Answer(submission, question, null, 0);
+                int awarded = gradeMatching(question, entry, trainee.getId(), answer);
+
+                answer.setAwardedMarks(awarded);
+                if (awarded == question.getMarks() && awarded > 0) correctCount++;
+                score += awarded;
+                answers.add(answer);
+                continue;
+            }
+
+            Long chosenId = entry == null ? null : entry.getSelectedOptionId();
 
             QuestionOption chosen = null;
             if (chosenId != null) {
+                final Long cid = chosenId;
                 chosen = question.getOptions().stream()
-                        .filter(o -> o.getId().equals(chosenId))
+                        .filter(o -> o.getId().equals(cid))
                         .findFirst()
                         .orElseThrow(() -> new IllegalArgumentException(
-                                "Option " + chosenId + " does not belong to question " + question.getId()));
+                                "Option " + cid + " does not belong to question " + question.getId()));
             }
 
             int awarded = (chosen != null && chosen.isCorrect()) ? question.getMarks() : 0;
@@ -138,6 +154,61 @@ public class TraineeExamService {
 
         return new SubmissionResultResponse(exam.getId(), exam.getTitle(), score,
                 exam.getTotalMarks(), correctCount, questions.size());
+    }
+
+    /**
+     * تصحيح سؤال مطابقة، بدرجات جزئية.
+     *
+     * كل زوج مستقل عن غيره، فمن العدل أن يأخذ المتدرّب نصيبه عن كل زوج
+     * وصله صحيحاً. تُحسب العلامة نسبةً إلى عدد الأزواج، ويُجبَر الناتج
+     * إلى العلامة الكاملة عند الإصابة الكاملة حتى لا يخسر التقريب علامة.
+     *
+     * الفهرس القادم من المتدرّب يُحوَّل إلى خيار بإعادة حساب الخلط الحتمي
+     * نفسه — فلا يحتاج الخادم أن يتذكّر ما أرسله.
+     */
+    private int gradeMatching(Question question,
+                              SubmitExamRequest.AnswerEntry entry,
+                              Long traineeId,
+                              Answer answer) {
+
+        List<QuestionOption> options = question.getOptions();
+        if (options.isEmpty()) return 0;
+
+        List<QuestionOption> rightOrder =
+                MatchShuffle.rightColumnOrder(options, question.getId(), traineeId);
+
+        Map<Long, Integer> sentIndex = new HashMap<>();
+        if (entry != null && entry.getPairs() != null) {
+            for (SubmitExamRequest.PairEntry pe : entry.getPairs()) {
+                if (pe.getOptionId() != null) {
+                    sentIndex.put(pe.getOptionId(), pe.getMatchIndex());
+                }
+            }
+        }
+
+        int correctPairs = 0;
+
+        for (QuestionOption option : options) {
+            Integer idx = sentIndex.get(option.getId());
+
+            QuestionOption matched = null;
+            if (idx != null) {
+                if (idx < 0 || idx >= rightOrder.size()) {
+                    throw new IllegalArgumentException(
+                            "Match index " + idx + " is out of range for question " + question.getId());
+                }
+                matched = rightOrder.get(idx);
+            }
+
+            AnswerPair pair = new AnswerPair(answer, option, matched);
+            answer.getPairs().add(pair);
+
+            if (pair.isCorrect()) correctPairs++;
+        }
+
+        if (correctPairs == options.size()) return question.getMarks();
+
+        return (int) Math.round((double) correctPairs / options.size() * question.getMarks());
     }
 
     // ---------- مساعدات ----------

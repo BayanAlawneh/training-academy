@@ -65,3 +65,66 @@
 .empty-state { text-align: center; padding: 46px 24px; }
 .empty-state .mark { font-family: var(--font-mono); font-size: 40px; color: var(--muted-2); margin-bottom: 10px; }
 .empty-state p { color: var(--muted); font-size: 14px; margin: 0; }
+
+
+/* ==========================================================================
+   محرّر أزواج المطابقة
+   ========================================================================== */
+
+.pair-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pair-num {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--card-soft);
+  border: 1px solid var(--rule-soft);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.pair-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 13.5px;
+}
+.pair-row input:focus { outline: none; border-color: var(--brass); }
+
+.pair-arrow {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--brass);
+}
+
+.pair-note {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.field select {
+  padding: 9px 11px;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  background: #fff;
+  color: var(--text);
+}
+.field select:focus { outline: none; border-color: var(--brass); }

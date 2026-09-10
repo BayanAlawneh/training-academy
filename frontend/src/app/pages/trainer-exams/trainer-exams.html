@@ -87,31 +87,74 @@
                     <input type="text" formControlName="text" placeholder="ما هي وظيفة @Transactional؟">
                   </div>
                   <div class="field">
+                    <label>نوع السؤال</label>
+                    <select formControlName="type" (change)="onKindChange(qi)">
+                      @for (k of kinds; track k) {
+                        <option [value]="k">{{ kindLabel[k] }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="field">
                     <label>العلامة</label>
                     <input type="number" formControlName="marks" min="1">
                   </div>
                 </div>
 
-                <label class="q-label" style="display:block; margin-bottom:8px;">
-                  الخيارات — اضغطي "صحيح" على الإجابة الصحيحة
-                </label>
+                @if (isMatching(qi)) {
 
-                <div formArrayName="options">
-                  @for (o of optionsOf(qi).controls; track $index; let oi = $index) {
-                    <div class="opt-row" [formGroupName]="oi">
-                      <input type="text" formControlName="text" [placeholder]="'خيار ' + (oi + 1)">
-                      <button type="button" class="correct-btn" [class.on]="isCorrect(qi, oi)"
-                              (click)="setCorrect(qi, oi)">صحيح</button>
-                      @if (optionsOf(qi).length > 2) {
-                        <button type="button" class="x-btn" (click)="removeOption(qi, oi)">×</button>
-                      }
-                    </div>
+                  <label class="q-label" style="display:block; margin-bottom:8px;">
+                    الأزواج — اكتب الطرفين، وسيراهما المتدرّب مخلوطين ليصلهما
+                  </label>
+
+                  <div formArrayName="options">
+                    @for (o of optionsOf(qi).controls; track $index; let oi = $index) {
+                      <div class="pair-row" [formGroupName]="oi">
+                        <span class="pair-num">{{ oi + 1 }}</span>
+                        <input type="text" formControlName="text"
+                               [placeholder]="'الطرف الأيسر ' + (oi + 1)">
+                        <span class="pair-arrow">←</span>
+                        <input type="text" formControlName="matchText"
+                               [placeholder]="'مقابله الصحيح ' + (oi + 1)">
+                        @if (optionsOf(qi).length > 2) {
+                          <button type="button" class="x-btn" (click)="removeOption(qi, oi)">×</button>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  @if (optionsOf(qi).length < 6) {
+                    <button type="button" class="btn-quiet" style="margin-top:6px;"
+                            (click)="addOption(qi)">+ زوج</button>
                   }
-                </div>
 
-                @if (optionsOf(qi).length < 6) {
-                  <button type="button" class="btn-quiet" style="margin-top:6px;"
-                          (click)="addOption(qi)">+ خيار</button>
+                  <p class="pair-note">
+                    التصحيح جزئي: كل زوج صحيح يأخذ نصيبه من علامة السؤال.
+                  </p>
+
+                } @else {
+
+                  <label class="q-label" style="display:block; margin-bottom:8px;">
+                    الخيارات — اضغطي "صحيح" على الإجابة الصحيحة
+                  </label>
+
+                  <div formArrayName="options">
+                    @for (o of optionsOf(qi).controls; track $index; let oi = $index) {
+                      <div class="opt-row" [formGroupName]="oi">
+                        <input type="text" formControlName="text" [placeholder]="'خيار ' + (oi + 1)">
+                        <button type="button" class="correct-btn" [class.on]="isCorrect(qi, oi)"
+                                (click)="setCorrect(qi, oi)">صحيح</button>
+                        @if (optionsOf(qi).length > 2) {
+                          <button type="button" class="x-btn" (click)="removeOption(qi, oi)">×</button>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  @if (optionsOf(qi).length < 6) {
+                    <button type="button" class="btn-quiet" style="margin-top:6px;"
+                            (click)="addOption(qi)">+ خيار</button>
+                  }
+
                 }
               </div>
             }

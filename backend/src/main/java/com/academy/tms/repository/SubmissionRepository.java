@@ -35,6 +35,18 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
            """)
     List<Submission> findAllByTraineeId(@Param("traineeId") Long traineeId);
 
+    /**
+     * أزواج المطابقة تشير إلى الإجابات، فتُحذف قبلها.
+     * تركها يجعل حذف المتدرّب يخرق قيد المفتاح الأجنبي.
+     */
+    @Modifying
+    @Query("""
+           delete from AnswerPair p where p.answer.id in (
+               select a.id from Answer a where a.submission.id in (
+                   select s.id from Submission s where s.trainee.id = :traineeId))
+           """)
+    int deleteAnswerPairsByTraineeId(@Param("traineeId") Long traineeId);
+
     @Modifying
     @Query("delete from Answer a where a.submission.id in (select s.id from Submission s where s.trainee.id = :traineeId)")
     int deleteAnswersByTraineeId(@Param("traineeId") Long traineeId);

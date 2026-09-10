@@ -5,7 +5,7 @@ import { NotificationBell } from '../../shared/notification-bell/notification-be
 import { AuthService } from '../../core/services/auth.service';
 import { ExamService } from '../../core/services/exam.service';
 import { ModalService } from '../../core/services/modal.service';
-import { Exam, GRADE_STATE_LABEL, GradeRow, GradeState } from '../../core/models/exam.models';
+import { Exam, GRADE_STATE_LABEL, GradeRow, GradeState, QUESTION_KIND_LABEL, QuestionKind } from '../../core/models/exam.models';
 
 @Component({
   selector: 'app-trainer-exams',
@@ -73,13 +73,38 @@ export class TrainerExams implements OnInit {
     this.showBuilder.set(false);
   }
 
+  readonly kinds: QuestionKind[] = ['MCQ', 'MATCHING'];
+  readonly kindLabel = QUESTION_KIND_LABEL;
+
   addQuestion(): void {
     this.questions.push(this.fb.group({
       text: ['', [Validators.required, Validators.maxLength(1000)]],
+      type: ['MCQ' as QuestionKind, Validators.required],
       marks: [5, [Validators.required, Validators.min(1)]],
       correctIndex: [0, Validators.required],
       options: this.fb.array([this.newOption(), this.newOption()])
     }));
+  }
+
+  kindOf(index: number): QuestionKind {
+    return this.questions.at(index).get('type')!.value as QuestionKind;
+  }
+
+  isMatching(index: number): boolean {
+    return this.kindOf(index) === 'MATCHING';
+  }
+
+  /**
+   * تغيير النوع يمسح الخيارات ويعيد بناءها.
+   * الحقول تختلف بين النوعين — الاحتفاظ بالقديمة يترك بيانات نصفية
+   * كخيار مطابقة بلا طرف أيمن، فيُرفض عند الحفظ برسالة غامضة.
+   */
+  onKindChange(index: number): void {
+    const options = this.optionsOf(index);
+    options.clear();
+    options.push(this.newOption());
+    options.push(this.newOption());
+    this.questions.at(index).get('correctIndex')!.setValue(0);
   }
 
   removeQuestion(index: number): void {
@@ -119,6 +144,19 @@ export class TrainerExams implements OnInit {
 
   save(): void {
     if (this.examForm.invalid) { this.examForm.markAllAsTouched(); return; }
+
+    // فحص محلي يعطي رسالة أوضح من ردّ الخادم العام
+    for (let i = 0; i < this.questions.length; i++) {
+      if (!this.isMatching(i)) continue;
+      const options = this.optionsOf(i);
+      for (let k = 0; k < options.length; k++) {
+        if (!options.at(k).get('matchText')!.value?.trim()) {
+          this.errorMessage.set(`السؤال ${i + 1}: الزوج ${k + 1} ناقص الطرف الأيمن`);
+          return;
+        }
+      }
+    }
+
     this.clearMessages();
 
     const raw = this.examForm.getRawValue();
@@ -130,11 +168,12 @@ export class TrainerExams implements OnInit {
       closesAt: this.withSeconds(raw.closesAt),
       questions: raw.questions.map((q: any) => ({
         text: q.text,
-        type: 'MCQ',
+        type: q.type as QuestionKind,
         marks: Number(q.marks),
         options: q.options.map((o: any, i: number) => ({
           text: o.text,
-          correct: i === Number(q.correctIndex)
+          correct: q.type === 'MATCHING' ? false : i === Number(q.correctIndex),
+          matchText: q.type === 'MATCHING' ? (o.matchText?.trim() || null) : null
         }))
       }))
     };
@@ -212,7 +251,10 @@ export class TrainerExams implements OnInit {
   }
 
   private newOption(): FormGroup {
-    return this.fb.group({ text: ['', Validators.required] });
+    return this.fb.group({
+      text: ['', Validators.required],
+      matchText: ['']
+    });
   }
 
   /** input[type=datetime-local] يعطي yyyy-MM-ddTHH:mm، وJava يقبل الثواني. */

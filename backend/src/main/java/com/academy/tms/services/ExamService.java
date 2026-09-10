@@ -216,7 +216,13 @@ public class ExamService {
             int optionPosition = 1;
             List<QuestionOption> options = new ArrayList<>();
             for (ExamRequest.OptionRequest or : qr.getOptions()) {
-                options.add(new QuestionOption(question, or.getText(), or.isCorrect(), optionPosition++));
+                if (type == QuestionType.MATCHING) {
+                    options.add(new QuestionOption(
+                            question, or.getText(), or.getMatchText(), optionPosition++));
+                } else {
+                    options.add(new QuestionOption(
+                            question, or.getText(), or.isCorrect(), optionPosition++));
+                }
             }
             question.getOptions().addAll(options);
 
@@ -230,17 +236,51 @@ public class ExamService {
         }
     }
 
+    /**
+     * قواعد التحقّق تختلف بحسب النوع:
+     *   MCQ / TRUE_FALSE — خيارَان على الأقل، وإجابة صحيحة واحدة بالضبط.
+     *   MATCHING        — زوجَان على الأقل، ولكل زوج طرفان مكتوبان.
+     * التحقّق في الخادم لا في الواجهة، فسؤال ناقص لا يمكن حفظه بأي طريق.
+     */
     private void validateQuestions(ExamRequest request) {
         int index = 1;
+
         for (ExamRequest.QuestionRequest qr : request.getQuestions()) {
+
+            QuestionType type = QuestionType.MCQ;
+            if (qr.getType() != null && !qr.getType().isBlank()) {
+                try {
+                    type = QuestionType.valueOf(qr.getType());
+                } catch (IllegalArgumentException ex) {
+                    throw new IllegalArgumentException("Unknown question type: " + qr.getType());
+                }
+            }
+
             if (qr.getOptions() == null || qr.getOptions().size() < 2) {
-                throw new IllegalArgumentException("Question " + index + " needs at least two options");
-            }
-            long correct = qr.getOptions().stream().filter(ExamRequest.OptionRequest::isCorrect).count();
-            if (correct != 1) {
                 throw new IllegalArgumentException(
-                        "Question " + index + " must have exactly one correct option");
+                        type == QuestionType.MATCHING
+                                ? "Question " + index + " needs at least two pairs"
+                                : "Question " + index + " needs at least two options");
             }
+
+            if (type == QuestionType.MATCHING) {
+                int pair = 1;
+                for (ExamRequest.OptionRequest or : qr.getOptions()) {
+                    if (or.getMatchText() == null || or.getMatchText().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Question " + index + ", pair " + pair + " is missing its right-hand item");
+                    }
+                    pair++;
+                }
+            } else {
+                long correct = qr.getOptions().stream()
+                        .filter(ExamRequest.OptionRequest::isCorrect).count();
+                if (correct != 1) {
+                    throw new IllegalArgumentException(
+                            "Question " + index + " must have exactly one correct option");
+                }
+            }
+
             index++;
         }
     }

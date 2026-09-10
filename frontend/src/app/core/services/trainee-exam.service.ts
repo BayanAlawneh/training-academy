@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.models';
-import { ExamPaper, MyExam, SubmissionResult } from '../models/exam.models';
+import { AnswerSubmission, ExamPaper, MyExam, SubmissionResult } from '../models/exam.models';
 
 /** اختبارات المتدرّب. */
 @Injectable({ providedIn: 'root' })
@@ -20,7 +20,7 @@ export class TraineeExamService {
     return this.http.get<ApiResponse<ExamPaper>>(`${this.baseUrl}/${examId}/paper`);
   }
 
-  submit(examId: number, answers: { questionId: number; selectedOptionId: number | null }[]):
+  submit(examId: number, answers: AnswerSubmission[]):
       Observable<ApiResponse<SubmissionResult>> {
     return this.http.post<ApiResponse<SubmissionResult>>(
       `${this.baseUrl}/${examId}/submit`, { answers });

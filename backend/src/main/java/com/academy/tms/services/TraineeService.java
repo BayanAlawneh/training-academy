@@ -141,7 +141,7 @@ public class TraineeService {
 
     /**
      * الحذف بالترتيب الصحيح للمفاتيح الأجنبية:
-     *   الإجابات ← التسليمات ← الحضور ← التسجيلات ← الملف ← الإشعارات ← الحساب
+     *   الأزواج ← الإجابات ← التسليمات ← الحضور ← التسجيلات ← الملف ← الإشعارات ← الحساب
      *
      * سابقاً كانت التسجيلات تُترك، فيرفض PostgreSQL حذف المتدرّب
      * ويُرمى DataIntegrityViolationException بلا معالجة، فيتحوّل الردّ
@@ -157,6 +157,9 @@ public class TraineeService {
 
         // الترتيب مهم: الإجابات تشير إلى التسليمات، والتسليمات والحضور
         // والتسجيلات كلها تشير إلى المتدرّب. أي واحد يُترك يُفشل الحذف.
+        submissionRepository.deleteAnswerPairsByTraineeId(id);
+        submissionRepository.flush();
+
         submissionRepository.deleteAnswersByTraineeId(id);
         submissionRepository.flush();
 

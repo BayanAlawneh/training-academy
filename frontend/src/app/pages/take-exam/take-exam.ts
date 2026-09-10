@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular
 import { ActivatedRoute, Router } from '@angular/router';
 import { TraineeExamService } from '../../core/services/trainee-exam.service';
 import { ModalService } from '../../core/services/modal.service';
-import { ExamPaper, SubmissionResult } from '../../core/models/exam.models';
+import { AnswerSubmission, ExamPaper, ExamQuestion, SubmissionResult } from '../../core/models/exam.models';
 
 @Component({
   selector: 'app-take-exam',
@@ -23,13 +23,35 @@ export class TakeExam implements OnInit, OnDestroy {
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  /** questionId → selectedOptionId */
+  /** MCQ: questionId → selectedOptionId */
   readonly choices = signal<Record<number, number>>({});
+
+  /**
+   * MATCHING: questionId → { optionId → matchIndex }
+   * نخزّن الفهرس لا النص، لأنه ما يفهمه الخادم ولأن النصوص قد تتكرّر.
+   */
+  readonly pairs = signal<Record<number, Record<number, number>>>({});
+
+  /** الطرف الأيمن المسحوب حالياً — للأجهزة التي تدعم السحب وللنقر المتتابع. */
+  readonly dragging = signal<{ questionId: number; index: number } | null>(null);
+
   readonly secondsLeft = signal<number | null>(null);
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  readonly answeredCount = computed(() => Object.keys(this.choices()).length);
+  /** سؤال المطابقة يُعدّ مُجاباً حين تُوصَل كل أطرافه لا بعضها. */
+  readonly answeredCount = computed(() => {
+    const p = this.paper();
+    if (!p) return 0;
+
+    return p.questions.filter(q => {
+      if (q.type === 'MATCHING') {
+        const got = this.pairs()[q.id] ?? {};
+        return Object.keys(got).length === q.options.length;
+      }
+      return this.choices()[q.id] !== undefined;
+    }).length;
+  });
 
   readonly allAnswered = computed(() => {
     const p = this.paper();
@@ -102,6 +124,81 @@ export class TakeExam implements OnInit, OnDestroy {
     this.choices.set({ ...this.choices(), [questionId]: optionId });
   }
 
+  // ---------------- المطابقة ----------------
+
+  /** يبدأ سحب طرف أيمن، أو يحدّده بالنقر على الأجهزة التي لا تسحب. */
+  startDrag(questionId: number, index: number): void {
+    this.dragging.set({ questionId, index });
+  }
+
+  endDrag(): void {
+    this.dragging.set(null);
+  }
+
+  /** يُفلت الطرف المسحوب على عنصر أيسر. */
+  dropOn(questionId: number, optionId: number): void {
+    const held = this.dragging();
+    if (!held || held.questionId !== questionId) return;
+
+    this.assign(questionId, optionId, held.index);
+    this.dragging.set(null);
+  }
+
+  /**
+   * يربط طرفاً أيمن بعنصر أيسر.
+   * الطرف الأيمن يُستخدم مرّة واحدة: إن كان موصولاً بعنصر آخر، يُفَكّ منه
+   * أولاً — وإلا أمكن وصل طرف واحد بعدّة عناصر وهو ما لا تسمح به المطابقة.
+   */
+  private assign(questionId: number, optionId: number, index: number): void {
+    const all = { ...this.pairs() };
+    const forQuestion = { ...(all[questionId] ?? {}) };
+
+    for (const key of Object.keys(forQuestion)) {
+      if (forQuestion[Number(key)] === index) delete forQuestion[Number(key)];
+    }
+
+    forQuestion[optionId] = index;
+    all[questionId] = forQuestion;
+    this.pairs.set(all);
+  }
+
+  /** يفكّ الوصل عن عنصر أيسر. */
+  clearPair(questionId: number, optionId: number): void {
+    const all = { ...this.pairs() };
+    const forQuestion = { ...(all[questionId] ?? {}) };
+    delete forQuestion[optionId];
+    all[questionId] = forQuestion;
+    this.pairs.set(all);
+  }
+
+  /** نصّ الطرف الموصول بعنصر أيسر، أو null. */
+  matchedText(q: ExamQuestion, optionId: number): string | null {
+    const index = this.pairs()[q.id]?.[optionId];
+    if (index === undefined || !q.matches) return null;
+    return q.matches.find(m => m.index === index)?.text ?? null;
+  }
+
+  /** هل هذا الطرف الأيمن مستخدَم بالفعل؟ يُخفَى من العمود حتى لا يُكرَّر. */
+  isMatchUsed(questionId: number, index: number): boolean {
+    const forQuestion = this.pairs()[questionId] ?? {};
+    return Object.values(forQuestion).includes(index);
+  }
+
+  isDragging(questionId: number, index: number): boolean {
+    const held = this.dragging();
+    return held !== null && held.questionId === questionId && held.index === index;
+  }
+
+  /** عنصر أيسر جاهز لاستقبال الإفلات. */
+  isDropTarget(questionId: number): boolean {
+    const held = this.dragging();
+    return held !== null && held.questionId === questionId;
+  }
+
+  matchedCount(q: ExamQuestion): number {
+    return Object.keys(this.pairs()[q.id] ?? {}).length;
+  }
+
   isChosen(questionId: number, optionId: number): boolean {
     return this.choices()[questionId] === optionId;
   }
@@ -117,7 +214,7 @@ export class TakeExam implements OnInit, OnDestroy {
     if (!auto) {
       const missing = p.questions.length - this.answeredCount();
       const message = missing > 0
-        ? `تركتِ ${missing} سؤالاً بلا إجابة وستُحتسب صفراً. تسليم الآن؟`
+        ? `تركتِ ${missing} سؤالاً بلا إجابة أو ناقص الوصل. تسليم الآن؟`
         : 'سيتم تسليم إجاباتك نهائياً ولا يمكن التعديل بعدها. متأكدة؟';
 
       const ok = await this.modal.confirm('تسليم الاختبار', message, { confirmText: 'تسليم' });
@@ -127,10 +224,24 @@ export class TakeExam implements OnInit, OnDestroy {
     this.submitting.set(true);
     this.errorMessage.set(null);
 
-    const answers = p.questions.map(q => ({
-      questionId: q.id,
-      selectedOptionId: this.choices()[q.id] ?? null
-    }));
+    const answers: AnswerSubmission[] = p.questions.map(q => {
+      if (q.type === 'MATCHING') {
+        const forQuestion = this.pairs()[q.id] ?? {};
+        return {
+          questionId: q.id,
+          selectedOptionId: null,
+          pairs: q.options.map(o => ({
+            optionId: o.id,
+            matchIndex: forQuestion[o.id] ?? null
+          }))
+        };
+      }
+      return {
+        questionId: q.id,
+        selectedOptionId: this.choices()[q.id] ?? null,
+        pairs: null
+      };
+    });
 
     this.api.submit(p.examId, answers).subscribe({
       next: (r) => {

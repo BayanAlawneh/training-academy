@@ -1,19 +1,31 @@
 export type ExamState = 'UPCOMING' | 'OPEN' | 'SUBMITTED' | 'MISSED';
 export type GradeState = 'SUBMITTED' | 'MISSED' | 'PENDING';
 
+export type QuestionKind = 'MCQ' | 'TRUE_FALSE' | 'MATCHING';
+
 export interface ExamOption {
   id: number;
   text: string;
   correct: boolean | null;
+  /** المقابل الصحيح — يظهر للمدرّب فقط، وnull للمتدرّب. */
+  matchText: string | null;
+}
+
+/** عنصر في العمود الأيمن كما عُرض للمتدرّب: فهرس مجهول لا يكشف الاقتران. */
+export interface MatchItem {
+  index: number;
+  text: string;
 }
 
 export interface ExamQuestion {
   id: number;
   text: string;
-  type: string;
+  type: QuestionKind;
   marks: number;
   position: number;
   options: ExamOption[];
+  /** MATCHING فقط: العمود الأيمن مخلوطاً. null في غيره. */
+  matches: MatchItem[] | null;
 }
 
 export interface Exam {
@@ -81,11 +93,29 @@ export interface ExamPayload {
   closesAt: string;
   questions: {
     text: string;
-    type: string;
+    type: QuestionKind;
     marks: number;
-    options: { text: string; correct: boolean }[];
+    options: { text: string; correct: boolean; matchText: string | null }[];
   }[];
 }
+
+/** زوج أرسله المتدرّب: معرّف الطرف الأيسر وفهرس الطرف الأيمن. */
+export interface PairSubmission {
+  optionId: number;
+  matchIndex: number | null;
+}
+
+export interface AnswerSubmission {
+  questionId: number;
+  selectedOptionId: number | null;
+  pairs: PairSubmission[] | null;
+}
+
+export const QUESTION_KIND_LABEL: Record<QuestionKind, string> = {
+  MCQ: 'اختيار من متعدد',
+  TRUE_FALSE: 'صح أو خطأ',
+  MATCHING: 'مطابقة (سحب وإفلات)'
+};
 
 export const EXAM_STATE_LABEL: Record<ExamState, string> = {
   UPCOMING: 'لم يبدأ بعد',

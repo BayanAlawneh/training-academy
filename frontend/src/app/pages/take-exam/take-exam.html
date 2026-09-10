@@ -40,7 +40,7 @@
       @if (errorMessage()) { <div class="alert">{{ errorMessage() }}</div> }
 
       @for (q of p.questions; track q.id; let i = $index) {
-        <div class="q-card" [class.answered]="isAnswered(q.id)">
+        <div class="q-card" [class.answered]="q.type === 'MATCHING' ? matchedCount(q) === q.options.length : isAnswered(q.id)">
           <div class="q-head">
             <div>
               <div class="q-num">سؤال {{ i + 1 }}</div>
@@ -49,12 +49,76 @@
             <span class="q-marks">{{ q.marks }} علامة</span>
           </div>
 
-          @for (opt of q.options; track opt.id) {
-            <button type="button" class="opt" [class.on]="isChosen(q.id, opt.id)"
-                    (click)="choose(q.id, opt.id)">
-              <span class="dot"></span>
-              <span>{{ opt.text }}</span>
-            </button>
+          @if (q.type === 'MATCHING') {
+
+            <p class="match-hint">
+              اسحب العنصر من العمود الأيسر وأفلته في مكانه، أو انقره ثم انقر مكانه.
+              @if (matchedCount(q) > 0) {
+                <span class="match-progress">وصلتَ {{ matchedCount(q) }} من {{ q.options.length }}</span>
+              }
+            </p>
+
+            <div class="match-grid">
+
+              <!-- العمود الأيمن في الواجهة: العناصر الثابتة التي تستقبل الإفلات -->
+              <div class="match-col">
+                @for (opt of q.options; track opt.id) {
+                  <div class="match-slot"
+                       [class.filled]="matchedText(q, opt.id) !== null"
+                       [class.can-drop]="isDropTarget(q.id) && matchedText(q, opt.id) === null"
+                       (dragover)="$event.preventDefault()"
+                       (drop)="$event.preventDefault(); dropOn(q.id, opt.id)"
+                       (click)="dropOn(q.id, opt.id)">
+                    <span class="slot-label">{{ opt.text }}</span>
+                    <span class="slot-value">
+                      @if (matchedText(q, opt.id); as m) {
+                        <span class="chip-set">
+                          {{ m }}
+                          <button type="button" class="chip-x"
+                                  (click)="$event.stopPropagation(); clearPair(q.id, opt.id)"
+                                  aria-label="فكّ الوصل">×</button>
+                        </span>
+                      } @else {
+                        <span class="slot-empty">أفلت هنا</span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <!-- العمود الأيسر: الأطراف القابلة للسحب، بترتيب مخلوط من الخادم -->
+              <div class="match-col match-bank">
+                @if (q.matches) {
+                  @for (m of q.matches; track m.index) {
+                    @if (!isMatchUsed(q.id, m.index)) {
+                      <div class="match-chip"
+                           [class.held]="isDragging(q.id, m.index)"
+                           draggable="true"
+                           (dragstart)="startDrag(q.id, m.index)"
+                           (dragend)="endDrag()"
+                           (click)="startDrag(q.id, m.index)">
+                        {{ m.text }}
+                      </div>
+                    }
+                  }
+                }
+                @if (matchedCount(q) === q.options.length) {
+                  <p class="bank-done">تمّ وصل كل الأطراف.</p>
+                }
+              </div>
+
+            </div>
+
+          } @else {
+
+            @for (opt of q.options; track opt.id) {
+              <button type="button" class="opt" [class.on]="isChosen(q.id, opt.id)"
+                      (click)="choose(q.id, opt.id)">
+                <span class="dot"></span>
+                <span>{{ opt.text }}</span>
+              </button>
+            }
+
           }
         </div>
       }

@@ -2,6 +2,9 @@ package com.academy.tms.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "answers")
 public class Answer {
@@ -26,6 +29,10 @@ public class Answer {
     @Column(name = "awarded_marks", nullable = false)
     private Integer awardedMarks;
 
+    /** أزواج المطابقة. فارغة في MCQ. */
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AnswerPair> pairs = new ArrayList<>();
+
     protected Answer() {
     }
 
@@ -42,4 +49,6 @@ public class Answer {
     public Question getQuestion() { return question; }
     public QuestionOption getSelectedOption() { return selectedOption; }
     public Integer getAwardedMarks() { return awardedMarks; }
+    public void setAwardedMarks(Integer awardedMarks) { this.awardedMarks = awardedMarks; }
+    public List<AnswerPair> getPairs() { return pairs; }
 }
